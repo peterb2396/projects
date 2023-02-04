@@ -1,10 +1,45 @@
 #test {
-//display:inline-block;
+display:inline-block;
+float:right;
 }
 
 #headshot{
 width: 300px;
 height: 300px;
-margin: 30px;
 
+}
+
+#mypanel
+{
+	margin:30px;
+}
+
+#image
+{
+display:inline-block;
+vertical-align: top ;
+}
+
+#mydetails
+{
+display:inline-block;
+padding:30px;
+}
+
+#myname
+{
+font-size: 30px;
+font-weight: bold;
+}
+
+#entry
+{
+width:400px;
+}
+
+#numberlabel
+{
+	padding: 10px;
+	text-align: center;
+	vertical-align: bottom ;
 }

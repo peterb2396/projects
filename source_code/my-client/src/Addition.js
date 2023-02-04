@@ -4,15 +4,10 @@ import './styles.css';
 
 const Addition = () => {
   const [sum, setSum] = useState(0);
-  const [first, setFirst] = useState(0);
-  const [second, setSecond] = useState(0);
   const add = () => {
-      setFirst((first) => parseInt(document.getElementById("num1").value)
-       );
-       
-        setSecond((second) => parseInt(document.getElementById("num2").value)
-       );
-      setSum((sum) => first + second);
+      
+      setSum((sum) => 
+      parseInt(document.getElementById("num1").value) + parseInt(document.getElementById("num2").value));
       
 }
 
@@ -33,21 +28,42 @@ const Addition = () => {
 </nav>
 
 
-     
-<div class="form-group" id="test">
-    <div id = "test">
-      <span id = "test">First Number: </span>
-      </div>
-    <input type="number" class="form-control" id="num1" placeholder="First Number"></input>
-</div >
+<div id = "mypanel">
+     <div id ="image">
+        <img id="headshot" src = "headshot.png" alt ="Headshot">
+        </img>
+     </div>
 
-<div class="form-group" id="test">
-      <span>Second Number: </span>
-    <input type="number" class="form-control" id="num2" placeholder="Second Number"></input>
+    <div id="mydetails">
+       <span id = "myname">
+       Peter Buonaiuto</span>
+       <p> 
+       My name is peter and im so cool</p>
+    </div>
 </div>
-  
-     <button type="button" class="btn btn-primary" onClick={add}>Submit</button>
-      <p>Sum = {sum} </p>
+
+<div id ="entry">
+<div>
+ <span id="numberlabel" >First Number: </span>
+    <div class="form-group" id="test">
+        <input type="number" class="form-control" id="num1"     placeholder="First Number"></input>
+    </div >
+</div>
+
+<br/>
+
+<div>
+    <span id="numberlabel" >Second Number: </span>
+    <div class="form-group" id="test">
+          <input type="number" class="form-control" id="num2" placeholder="Second Number"></input>
+    </div>
+</div>
+</div>  
+
+  <br/>
+     <button type="button" class="btn btn-primary" 
+     style= {{ margin: "10px" }} onClick={add}>Submit</button>
+      <p style= {{ padding: "10px" }}>Sum = {sum} </p>
 
    
     </div>
