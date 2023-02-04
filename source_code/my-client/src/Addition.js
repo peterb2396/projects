@@ -2,15 +2,17 @@ import React, { useState } from "react";
 import 'bootstrap/dist/css/bootstrap.css';
 import './styles.css';
 
-const Addition = () => {
-  const [sum, setSum] = useState(0);
-  const add = () => {
-      
-      setSum((sum) => 
-      parseInt(document.getElementById("num1").value) + parseInt(document.getElementById("num2").value));
-      
-}
+const Addition = () =>  {
 
+  const [sum, setSum] = useState(0);
+  function add() { setSum((sum) => readSum()); }
+
+function readSum()
+ {
+    let x = parseInt(document.getElementById("num1").value);
+    let y = parseInt(document.getElementById("num2").value);
+    return (x+y);
+}
 
   return (
     <div className="Addition" id="main">
@@ -63,7 +65,12 @@ const Addition = () => {
   <br/>
      <button type="button" class="btn btn-primary" 
      style= {{ margin: "10px" }} onClick={add}>Submit</button>
-      <p style= {{ padding: "10px" }}>Sum = {sum} </p>
+     
+      <p style= {{ padding: "10px" }}>Your Addition result from server = {sum} 
+      <br/>
+      Your Addition result from ReactJS = {readSum}
+      
+      </p>
 
    
     </div>
