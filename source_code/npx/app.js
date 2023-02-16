@@ -1,7 +1,4 @@
-//change localhost to instance url on frontend
-// npm run build
-// copy contents of build/ to server public file
-// add node modules to git ignore
+
 // on amazon instance console, do git clone 
 // cd to npx (server)
 // and then do npm install, npm startw
