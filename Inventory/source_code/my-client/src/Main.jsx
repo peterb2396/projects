@@ -13,18 +13,30 @@ const Main = () => {
     
 
 
-    const items = 
+    const [items, setItems] = useState(
     [
-        {name:"Milo", qty:4, img: "http://clipart-library.com/img/1678242.png"},
-        {name:"Luna", qty:2, img: "http://clipart-library.com/img/1678251.png"},
-        {name:"Fin", qty:8, img: "http://clipart-library.com/img/1678368.png"}
-    ]
+        {name:"Milo", qty:4, img: "http://clipart-library.com/img/1678242.png", index: 0},
+        {name:"Luna", qty:2, img: "http://clipart-library.com/img/1678251.png", index: 1},
+        {name:"Fin", qty:8, img: "http://clipart-library.com/img/1678368.png", index: 2},
+    ]);
 
     const [curItem, setCurItem] = useState(items[0]);
     const [curPage, setCurPage] = useState("page-view");
     const [itemComponents, setItemComponents] = useState();
+    const [filter, setFilter] = useState("");
+    const [validName, setValidName] = useState(true);
+    const [validQty, setValidQty] = useState(true);
 
-    
+
+
+    // Changing the filter changes the state
+    // As a result, our onEffect hook is called
+    // This will refresh the results based on the new filter since the hook calls the refresh.
+    function updateFilter(event)
+    {
+        const newValue = event.target.value
+        setFilter(newValue)
+    }
 
     
     function showPage(show)
@@ -43,7 +55,12 @@ const Main = () => {
     {
         // We need to show the update page and display this item there
         showPage("page-update");
-        setCurItem(item)
+        let oldItem = Object.assign({}, item);
+        setCurItem(oldItem) // A copy of the original item
+
+        document.getElementById("nameInput").value = item.name
+        document.getElementById("qtyInput").value = item.qty
+
 
     }
 
@@ -53,11 +70,20 @@ const Main = () => {
         // Will reflect whatever is in our item array
         // When do we set the array to the database content?
         // Maybe i should do it here too since this function runs on the effect hook?
-        setItemComponents( 
-            items.map(item => (
-            <ItemCard item = {item} edit = {updateItem} key={items.indexOf(item)} />
-            ))
-        )
+       
+        
+        let comps = [];
+        // Add each element that matches the filter
+        for (let i = 0; i < items.length; i++)
+        {
+            // If there's no filter or if this element satisfies the filter
+            if (items[i].name.toLowerCase().indexOf(filter.toLowerCase()) > -1) 
+            {
+                comps.push(<ItemCard item = {items[i]} edit = {updateItem} key={i} />)
+            }
+        }
+
+        setItemComponents(comps);
       
     }
 
@@ -68,13 +94,76 @@ const Main = () => {
         
     }
 
+    // Item was saved. Called from EITHER newItem or updateItem!
+    // Now we set the item at index to curItem which is a copy of what we want!
+    function saveItem()
+    {
+        // Use state to update our array with the new item, curItem, which is a modified copy of the original.
+       items[curItem.index] = curItem;
+       setItems(items);
+
+       showPage("page-view");
+       
+        
+    }
+
+    // cancel item update (from navbar) restore state to previous
+    function cancelUpdate()
+    {
+        
+        showPage("page-view");
+    }
+
+    //Updated item details
+    function updateItemName(event)
+    {
+        
+        if (event.target.value)
+        {
+            setValidName(true);
+            curItem.name = event.target.value;
+            if (validQty)
+            {
+                document.getElementById("confirm-item").style.display = "block";
+            }
+            
+        }
+        else 
+        {
+            setValidName(false);
+            document.getElementById("confirm-item").style.display = 'none';
+        
+        }
+    }
+
+    //Update item qty
+    function updateItemQty(event)
+    {
+        
+        // verify numerical
+        if (event.target.value)
+        {
+            setValidQty(true);
+            curItem.qty = event.target.value;
+            if (validName)
+            {
+                document.getElementById("confirm-item").style.display = "block";
+            }
+        }
+        else 
+        {
+            setValidQty(false);
+            document.getElementById("confirm-item").style.display = 'none';
+        
+        }
+    }
     
 
     return (
     // MAIN VIEW PAGE
     <div id = "content-border">
         <div class="card border-secondary mb-3" id = "page-view">
-                    <div class="card-header"><NavBar mode="0" newItem={newItem}></NavBar></div>
+                    <div class="card-header"><NavBar mode="0" newItem={newItem} updateFilter={updateFilter}></NavBar></div>
                     <div class="card-body text-secondary"  id = "content">
                         
                         {itemComponents}
@@ -84,11 +173,30 @@ const Main = () => {
 
         
         <div class="card border-secondary mb-3" id = "page-update" >
-                    <div class="card-header"><NavBar mode="1" showPage={showPage}></NavBar></div>
+                    <div class="card-header"><NavBar mode="1" showPage={showPage} cancelUpdate={cancelUpdate}></NavBar></div>
                     <div class="card-body text-secondary"  id = "content">
                         <div id = "currentItem">
                             <ItemCard item = {curItem} id = "curItemPreview"/>
                         </div>
+
+                        <div id = "form-entry">
+                            <form>
+                                <div class="form-group">
+                                    <label for="nameInput">Name</label>
+                                    <input type="text" class="form-control" id="nameInput" onInput={updateItemName} placeholder="Enter a name!"></input>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="qtyInput">Quantity</label>
+                                    <input type="number" class="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
+                                </div>
+
+                                <div class = "form-group" id = "confirm-item">
+                                    <button type="button" class="btn btn-outline-success" onClick = {saveItem}>Confirm</button>
+                                </div>
+                            </form>
+                        </div>
+
                     </div>
         </div>
     </div>

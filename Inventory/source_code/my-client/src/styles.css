@@ -35,7 +35,7 @@
 	overflow-y:auto;
 	width: 100%;
 	
-	padding:25px;
+	padding:10px;
 	
 	
 }
@@ -51,6 +51,22 @@
 
 .card-text {
 	display:inline-block
+}
+
+#form-entry {
+	display:inline-block;
+	position: absolute;
+	top:100px;
+
+}
+
+#currentItem {
+	display:inline-block
+}
+
+#confirm-item {
+	float:right;
+	padding-top: 10px;
 }
 
 #card {

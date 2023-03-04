@@ -1,6 +1,7 @@
 
 const ItemCard = props => {
 
+    //When we click, send this item as a ref
     function modify()
     {
         props.edit(props.item);
@@ -10,7 +11,7 @@ const ItemCard = props => {
         <div id = "card-border" onClick = {modify}> 
             
             <div class="card border-secondary mb-3" id = "card">
-                <div class="card-header">{props.item.name}</div>
+                <div class="card-header">{(props.item.name)? props.item.name : "Item Name"}</div>
                 <div class="card-body text-secondary">
                     <img src = {props.item.img} alt = "Item" width = "200px" height = "200px" id = "card-img"></img>
                     <div id = "qty">
