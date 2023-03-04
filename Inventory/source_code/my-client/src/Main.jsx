@@ -1,6 +1,5 @@
 import React, { useState, useEffect} from "react";
 import NavBar from './Components/NavBar.jsx'
-import NewItem from './Components/NewItem.jsx'
 import ItemCard from './Components/ItemCard.jsx'
 import 'bootstrap/dist/css/bootstrap.css';
 import './styles.css';
@@ -40,22 +39,23 @@ const Main = () => {
     {
         // We need to show the update page and display this item there
         showPage("page-update");
+
         let oldItem = Object.assign({}, item);
         setCurItem(oldItem) // A copy of the original item
 
-        document.getElementById("nameInput").value = item.name
-        document.getElementById("qtyInput").value = item.qty
+
+        document.getElementById("nameInput").value = item.name;
+        
+        document.getElementById("qtyInput").value = item.qty;
+    
+        document.getElementById("imgInput").value = item.img;
+        
 
 
     }, [showPage])
 
     // Refresh the view from database (or dummy)
     const refreshList = React.useCallback(() => {
-    
-        // Will reflect whatever is in our item array
-        // When do we set the array to the database content?
-        // Maybe i should do it here too since this function runs on the effect hook?
-       
         
         let comps = [];
         // Add each element that matches the filter
@@ -85,6 +85,7 @@ const Main = () => {
     // should be easy. We do it locally and then update the DB after to reflect it
     useEffect(() => {    
         refreshList();
+        
     },  [refreshList]);
 
 
@@ -97,9 +98,6 @@ const Main = () => {
         setFilter(newValue)
     }
 
-
-    // Add a new item: Show the new item page with a new blank item ref that will reflect updates (useState)
-    // use curItem for this? probably!
     function newItem()
     {
         // We need to show the update page and display this item there
@@ -107,11 +105,12 @@ const Main = () => {
         // We know that this is a "new item" for the html because index === items.length
 
         showPage("page-update");
-        let newItem = {name:"", qty:0, img:"", index:items.length }
+        let newItem = {name:"", qty:0, img:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930", index:items.length }
         setCurItem(newItem) // A copy of the original item
 
         document.getElementById("nameInput").value = ""
         document.getElementById("qtyInput").value = ""
+        document.getElementById("imgInput").value = ""
     }
 
     // Item was saved. Called from EITHER newItem or updateItem!
@@ -141,7 +140,11 @@ const Main = () => {
         if (event.target.value)
         {
             setValidName(true);
+
             curItem.name = event.target.value;
+            let newItem = Object.assign({}, curItem);
+            setCurItem(newItem);
+            
             if (validQty)
             {
                 document.getElementById("confirm-item").style.display = "block";
@@ -164,7 +167,11 @@ const Main = () => {
         if (event.target.value)
         {
             setValidQty(true);
+
             curItem.qty = event.target.value;
+            let newItem = Object.assign({}, curItem);
+            setCurItem(newItem);
+
             if (validName)
             {
                 document.getElementById("confirm-item").style.display = "block";
@@ -176,6 +183,24 @@ const Main = () => {
             document.getElementById("confirm-item").style.display = 'none';
         
         }
+    }
+
+    //Update item img
+    function updateItemImg(event)
+    {
+        //curItem.img = event.target.value;
+        const input = document.getElementById("imgInput");
+        const img = input.files[0];
+
+        let src = URL.createObjectURL(img);
+  
+        curItem.img = src;
+        let newItem = Object.assign({}, curItem);
+        setCurItem(newItem);
+
+        console.log(src);
+        
+
     }
 
     //Delete item
@@ -228,6 +253,10 @@ const Main = () => {
                                     <input type="number" class="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
                                 </div>
 
+                                <div class="form-group">
+                                    <label>Upload Image</label>
+                                    <input type="file" class="form-control" id="imgInput" onInput={updateItemImg}/>
+                                </div>
                                 
                                     <div class = "form-group" id = "modify-item-btns">
                                         <button type="button" class="btn btn-outline-danger" id = "delete-item" onClick = {deleteItem}>Delete </button>

@@ -1,5 +1,10 @@
-
+import React, { useEffect} from "react";
 const ItemCard = props => {
+
+    useEffect(() => {    
+        //console.log(props.item.img)
+        
+    },  [props.item]);
 
     //When we click, send this item as a ref
     function modify()
