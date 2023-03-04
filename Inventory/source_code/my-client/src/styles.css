@@ -1,0 +1,81 @@
+
+#new1 {
+
+	display:inline-block;
+
+}
+
+#new2 {
+
+	display:inline-block;
+	
+	transform: translateY(-5%);
+
+}
+
+
+
+#card-border{
+	padding-left: 15px;
+	padding-top: 15px;
+	padding-right: 15px;
+	display:inline-block;
+	overflow-y:auto;
+}
+
+#content
+{
+	overflow-y:auto;
+	height:600px
+	
+}
+
+#content-border
+{
+	overflow-y:auto;
+	width: 100%;
+	
+	padding:25px;
+	
+	
+}
+
+#qty {
+	width:100%;
+
+}
+
+#item-qty {
+	float: right;
+}
+
+.card-text {
+	display:inline-block
+}
+
+#card {
+ max-width: 18rem;
+ transition: transform .2s;
+
+}
+
+#card:hover {
+	
+	transform: scale(1.05);
+	cursor:pointer;
+}
+
+
+#card-img{
+	margin:auto;
+}
+
+#page-update
+{
+	display:none;
+}
+
+#curItemPreview
+{
+	transform: scale(2);
+}
