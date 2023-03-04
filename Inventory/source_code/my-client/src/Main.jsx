@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import NavBar from './Components/NavBar.jsx'
 import NewItem from './Components/NewItem.jsx'
 import ItemCard from './Components/ItemCard.jsx'
@@ -7,12 +7,7 @@ import './styles.css';
 
 const Main = () => {
 
-    useEffect(() => {    
-        refreshList();
-    });
-    
-
-
+    // items reflects our database. When it changes we refreshList() through the callback hook on this variable
     const [items, setItems] = useState(
     [
         {name:"Milo", qty:4, img: "http://clipart-library.com/img/1678242.png", index: 0},
@@ -28,18 +23,7 @@ const Main = () => {
     const [validQty, setValidQty] = useState(true);
 
 
-
-    // Changing the filter changes the state
-    // As a result, our onEffect hook is called
-    // This will refresh the results based on the new filter since the hook calls the refresh.
-    function updateFilter(event)
-    {
-        const newValue = event.target.value
-        setFilter(newValue)
-    }
-
-    
-    function showPage(show)
+    const showPage = React.useCallback((show) =>
     {
         // Hide the open page
         document.getElementById(curPage).style.display='none';
@@ -49,10 +33,10 @@ const Main = () => {
 
         setCurPage(show);
 
-    }
+    }, [curPage])
 
     // We clicked on an item
-    function updateItem(item)
+    const updateItem = React.useCallback((item) =>
     {
         // We need to show the update page and display this item there
         showPage("page-update");
@@ -63,11 +47,11 @@ const Main = () => {
         document.getElementById("qtyInput").value = item.qty
 
 
-    }
+    }, [showPage])
 
     // Refresh the view from database (or dummy)
-    function refreshList()
-    {
+    const refreshList = React.useCallback(() => {
+    
         // Will reflect whatever is in our item array
         // When do we set the array to the database content?
         // Maybe i should do it here too since this function runs on the effect hook?
@@ -91,13 +75,43 @@ const Main = () => {
         setItems(items); // Saves the re-indexing incase there was a deletion
         setItemComponents(comps);
       
+    }, [filter, items, updateItem])
+
+    
+    // Refresh the list when our items change
+    // at the same time, we have to update the db
+    // in add item, we can call db add
+    // in remove item, we can call db remove etc...
+    // should be easy. We do it locally and then update the DB after to reflect it
+    useEffect(() => {    
+        refreshList();
+    },  [refreshList]);
+
+
+    // Changing the filter changes the state
+    // As a result, our onEffect hook is called
+    // This will refresh the results based on the new filter since the hook calls the refresh.
+    function updateFilter(event)
+    {
+        const newValue = event.target.value
+        setFilter(newValue)
     }
+
 
     // Add a new item: Show the new item page with a new blank item ref that will reflect updates (useState)
     // use curItem for this? probably!
     function newItem()
     {
-        
+        // We need to show the update page and display this item there
+        // We display a new item with the next index
+        // We know that this is a "new item" for the html because index === items.length
+
+        showPage("page-update");
+        let newItem = {name:"", qty:0, img:"", index:items.length }
+        setCurItem(newItem) // A copy of the original item
+
+        document.getElementById("nameInput").value = ""
+        document.getElementById("qtyInput").value = ""
     }
 
     // Item was saved. Called from EITHER newItem or updateItem!
@@ -109,7 +123,7 @@ const Main = () => {
        setItems(items);
 
        showPage("page-view");
-       
+       refreshList();
         
     }
 
@@ -173,6 +187,7 @@ const Main = () => {
         const before = items.slice(0, curItem.index);
         const after = items.slice(curItem.index + 1);
         
+        // Will call refresh because refresh uses callback hook that depends on items!!!!!!!!!!
         setItems( before.concat(after) );
 
         showPage("page-view");
@@ -204,12 +219,12 @@ const Main = () => {
                         <div id = "form-entry">
                             <form>
                                 <div class="form-group">
-                                    <label for="nameInput">Name</label>
+                                    <label >Name</label>
                                     <input type="text" class="form-control" id="nameInput" onInput={updateItemName} placeholder="Enter a name!"></input>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="qtyInput">Quantity</label>
+                                    <label >Quantity</label>
                                     <input type="number" class="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
                                 </div>
 

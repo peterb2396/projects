@@ -4,7 +4,8 @@ const ItemCard = props => {
     //When we click, send this item as a ref
     function modify()
     {
-        props.edit(props.item);
+        if (props.edit)
+            props.edit(props.item);
     }
 
     return( 
