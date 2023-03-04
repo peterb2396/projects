@@ -51,6 +51,7 @@ const Main = () => {
 
     }
 
+    // We clicked on an item
     function updateItem(item)
     {
         // We need to show the update page and display this item there
@@ -76,6 +77,10 @@ const Main = () => {
         // Add each element that matches the filter
         for (let i = 0; i < items.length; i++)
         {
+
+            // Set the index of each item! Useful for deletions and modifications!
+            items[i].index = i;
+
             // If there's no filter or if this element satisfies the filter
             if (items[i].name.toLowerCase().indexOf(filter.toLowerCase()) > -1) 
             {
@@ -83,6 +88,7 @@ const Main = () => {
             }
         }
 
+        setItems(items); // Saves the re-indexing incase there was a deletion
         setItemComponents(comps);
       
     }
@@ -107,7 +113,7 @@ const Main = () => {
         
     }
 
-    // cancel item update (from navbar) restore state to previous
+    // cancel item update (from navbar) go back without updating state
     function cancelUpdate()
     {
         
@@ -157,6 +163,22 @@ const Main = () => {
         
         }
     }
+
+    //Delete item
+    function deleteItem()
+    {
+        // Tell DB to remove this item (curItem)
+        // For now I will copy the array without it and set it with state
+
+        const before = items.slice(0, curItem.index);
+        const after = items.slice(curItem.index + 1);
+        
+        setItems( before.concat(after) );
+
+        showPage("page-view");
+        // This should call refresh, because state has changed (items), so refresh will then update item indeces!
+        // This resolves gaps. (i.e. deleting index 1 previously left [0, 2] now 2 gets re indexed to 1.)
+    }
     
 
     return (
@@ -191,9 +213,13 @@ const Main = () => {
                                     <input type="number" class="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
                                 </div>
 
-                                <div class = "form-group" id = "confirm-item">
-                                    <button type="button" class="btn btn-outline-success" onClick = {saveItem}>Confirm</button>
-                                </div>
+                                
+                                    <div class = "form-group" id = "modify-item-btns">
+                                        <button type="button" class="btn btn-outline-danger" id = "delete-item" onClick = {deleteItem}>Delete </button>
+                                        <button type="button" class="btn btn-outline-success" id = "confirm-item" onClick = {saveItem}>Confirm</button>
+                                    </div>
+
+                    
                             </form>
                         </div>
 
