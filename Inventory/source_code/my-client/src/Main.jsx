@@ -255,7 +255,7 @@ const Main = () => {
 
                                 <div class="form-group">
                                     <label>Upload Image</label>
-                                    <input type="file" class="form-control" id="imgInput" onInput={updateItemImg}/>
+                                    <input type="file" class="form-control" id="imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
                                 </div>
                                 
                                     <div class = "form-group" id = "modify-item-btns">
