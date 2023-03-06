@@ -24,8 +24,10 @@ const ItemCard = props => {
                     <div class="card-body text-secondary">
                         <img src = {props.item.img} alt = "Item" width = "200px" height = "200px" id = "card-img"
                         onError={event => {
+                            // Load the default image
                             event.target.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg"
                             event.onerror = null
+                            console.log("failed image:", props.item.img)
                           }}></img>
                         <div id = "qty">
                             <p class="card-text">Quantity:</p>

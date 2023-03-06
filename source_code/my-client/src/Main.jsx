@@ -5,6 +5,7 @@ import Addition from "./Components/Addition.jsx";
 import 'bootstrap/dist/css/bootstrap.css';
 import './styles.css';
 import axios from 'axios';
+import FormData from 'form-data';
 
 
 const Main = () => {
@@ -20,7 +21,12 @@ const Main = () => {
     const [validName, setValidName] = useState(true);
     const [validQty, setValidQty] = useState(true);
 
-    const [imgData, setimgData] = useState({});
+    //const [imgData, setimgData] = useState({});
+    //let form;
+    let dummy = new FormData();
+    const [form, setForm] = useState(dummy)
+    
+
     
 
 
@@ -40,7 +46,9 @@ const Main = () => {
 
     // We clicked on an item
     const updateItem = React.useCallback((item) =>
+
     {
+
         // We need to show the update page and display this item there
         showPage("page-update");
 
@@ -123,6 +131,7 @@ const Main = () => {
     }
 
     function newItem()
+    
     {
         // We need to show the update page and display this item there
         // We display a new item with the next index
@@ -157,13 +166,23 @@ const Main = () => {
     // either save it or add it
     async function saveToDB()
     {
-        
-            await axios.post(`http://localhost:9000/addItem/${curItem.name}/${curItem.qty}/${imgData.name}/${curItem.id}`)
+        //console.log(form)
+            await axios.post(`http://localhost:9000/addItem/${curItem.name}/${curItem.qty}/${curItem.id}`,
+            form,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                  Authentication: 'Bearer ...',
+                },
+              })
+            
 
           .then(function (response) {
             //handle success, return id so i need to add the id to the response json on server
             //console.log(response);
+            //console.log(response.data)
             getItems();
+            
             return response.data._id;
           })
           .catch(function (response) {
@@ -244,12 +263,40 @@ const Main = () => {
         const input = document.getElementById("imgInput");
         const img = input.files[0];
 
+        
+        // trying again with form!
+         //make a new form object to send because we are picking a new image?
+        // problem is, if i go to update and dont change the image, i have no payload to send, or itll be empty
+        // so i need to fill it with the current image (this stuff below!) not here, but on submit.
+        // if we arent changing the image, we still must have this payload stored in the item database
+        // which of course it will be. So with that said, since its in the DB it will be in the curItem and we 
+        // can just send through curItem.imgdata ...
+        form.append('image', img, img.name)
+
+        setForm(form)
+
+        //var reader = new FileReader();
+        //reader.onloadend = function() {
+            // Called when we read image
+            //console.log('RESULT', reader.result)
+            //imgData['name'] = reader.result.substring(reader.result.indexOf("base64,") + 7) //store it
+            //imgData['name'] = encodeURIComponent(reader.result.substring(50));
+            //imgData['type'] = reader.result.substring( reader.result.indexOf(""))
+            //setimgData(imgData);
+        //  }
+
+
+
+        //reader.readAsDataURL(img);
+
         // imgData is used for databse. The rest is used for local preview!
-        imgData['name'] = img.name
-        setimgData(imgData);
+        
+
 
         // Display src as the image, but upload imgData to the DB for storage
         let src = URL.createObjectURL(img);
+        //imgData['name'] = src; // i was doing this when trying to pass as a string, base64 for example but failed.
+        //setimgData(imgData)
   
         curItem.img = src;
         let newItem = Object.assign({}, curItem);
@@ -318,7 +365,7 @@ const Main = () => {
 
                         <div class="form-group">
                             <label>Upload Image</label>
-                            <input type="file" class="form-control" id="imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
+                            <input type="file" class="form-control" id="imgInput" name = "imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
                         </div>
                         
                             <div class = "form-group" id = "modify-item-btns">
