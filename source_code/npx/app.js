@@ -66,15 +66,16 @@ const Item = mongoose.model('Item', itemSchema);
 
 //endpoint to add an item to the DB!!!!!
 // server recieved client request.
-//app.post('/addItem/:name/:qty/:id', upload.array("files"), uploadFiles);
+app.post('/addItem/:name/:qty/:id', upload.array("image"), add);
 
-app.post('/addItem/:name/:qty/:id', (req,res) => {
+function add(req, res)
+{
   let name = req.params.name;
   let qty = req.params.qty;
-  let img = req.files; // i am now trying to pass through payload rather than uri
+  let img = req.files[0]; // i am now trying to pass through payload rather than uri
   let id = req.params.id; //if none we are adding
 
-  console.log(req.files)
+  console.log(req.files[0])
   
 
   // doesnt exist so add it
@@ -98,10 +99,9 @@ app.post('/addItem/:name/:qty/:id', (req,res) => {
   }) //id will remain the same
     
   }
-  
+}
 
 
-});
 
 
 // get all items
