@@ -3,7 +3,7 @@
 // cd to npx (server)
 // and then do npm install, npm startw
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads;" });
 var express = require('express');
 
 var path = require('path');
@@ -15,8 +15,10 @@ var app = express();
 app.use(cors());
 
 app.use(express.json());
-//app.use(express.urlencoded({ extended: false }));
+
+// allow access to public and images
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads/', express.static(path.join(__dirname, 'uploads')));
 //app.use (fileupload());
 app.use (express.urlencoded({extended: true}));
 
@@ -51,7 +53,7 @@ app.listen(PORT, () => {
 const itemSchema = new mongoose.Schema({
   name: String,
   qty: Number,
-  img: Map,
+  img: String,
 });
 // Compile schema to a Model (create "Item")
 const Item = mongoose.model('Item', itemSchema);
@@ -72,7 +74,7 @@ function add(req, res)
 {
   let name = req.params.name;
   let qty = req.params.qty;
-  let img = req.files[0]; // i am now trying to pass through payload rather than uri
+  let img = req.files[0].filename; // i am now trying to pass through payload rather than uri
   let id = req.params.id; //if none we are adding
 
   console.log(req.files[0])
