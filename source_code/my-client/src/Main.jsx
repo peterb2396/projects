@@ -7,7 +7,6 @@ import './styles.css';
 import axios from 'axios';
 import FormData from 'form-data';
 
-
 const Main = () => {
     
      
@@ -18,18 +17,12 @@ const Main = () => {
     const [curPage, setCurPage] = useState("page-welcome");
     const [itemComponents, setItemComponents] = useState();
     const [filter, setFilter] = useState("");
-    const [validName, setValidName] = useState(true);
-    const [validQty, setValidQty] = useState(true);
 
     //const [imgData, setimgData] = useState({});
     //let form;
     let dummy = new FormData();
     const [form, setForm] = useState(dummy)
     
-
-    
-
-
 
     const showPage = React.useCallback((show) =>
     {
@@ -45,15 +38,27 @@ const Main = () => {
     }, [curPage])
 
     // We clicked on an item
+    // store the details in form in case we hit update we can pass the data through
+    // Hide the confirm button until a modification is made???
     const updateItem = React.useCallback((item) =>
 
     {
+        // We can delete , bc it does exist here!
+        document.getElementById("delete-item").style.display = 'block';
+        
 
         // We need to show the update page and display this item there
         showPage("page-update");
 
         let oldItem = Object.assign({}, item);
         setCurItem(oldItem) // A copy of the original item
+
+        // Set the default data for if we confirm these changes
+        form.set('qty', item.qty)
+        form.set('name', item.name)
+        form.set('id', item.id)
+        form.set('details', item.details)
+        setForm(form)
 
 
         document.getElementById("nameInput").value = item.name;
@@ -62,8 +67,13 @@ const Main = () => {
     
         document.getElementById("imgInput").value = "";
 
+        document.getElementById("details").value = item.details;
 
-    }, [showPage])
+        // should we show confirm btn? make sure to call this AFTER changing the input fields!!
+        validateConfirm()
+
+
+    }, [showPage, form])
 
     // Refresh the view, does NOT update from DB! That occurs when we add, delete, modify or refresh.
     const refreshList = React.useCallback(() => {
@@ -99,17 +109,19 @@ const Main = () => {
         .then((response) => {
             
             let newArray = []
-            //console.log(response.data)
             response.data.forEach((item, index) => 
             {
                 if (!newArray.includes({name: item.name, qty: item.qty, img: item.img, id: item._id}))
                 {
-                    newArray.push({name: item.name, qty: item.qty, img: item.img, id: item._id})
+                    newArray.push({name: item.name, qty: item.qty, img: item.img, id: item._id, details: item.details})
                 }
             })
             setItems(newArray)// not doing anything?
             refreshList(); // Populate the list with our items array from DB
-          });
+          })
+        .catch((res) => {
+            //console.log(res)
+        })
     }
  
     
@@ -130,20 +142,41 @@ const Main = () => {
         setFilter(newValue)
     }
 
+    function validateConfirm()
+    {
+        let name = document.getElementById("nameInput").value
+        let qty = document.getElementById("qtyInput").value
+
+        if (name && qty)
+            document.getElementById("confirm-item").style.display = 'block';
+        else
+            document.getElementById("confirm-item").style.display = 'none';
+
+    }
+
     function newItem()
     
     {
-        // We need to show the update page and display this item there
-        // We display a new item with the next index
-        // We know that this is a "new item" for the html because index === items.length
+        // We cant delete , bc it doesnt exist yet!
+        document.getElementById("delete-item").style.display = 'none';
+
+        form.set('id', "none")
+        form.set('name', "")
+        form.set('qty', 0)
+        form.set('details', "")
+        setForm(form)
 
         showPage("page-update");
-        let newItem = {name:"", qty:0, img:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg", id: "none" }
+        let newItem = {name:"", qty:0, img:"", id: "none", details: "" }
         setCurItem(newItem) // A copy of the original item
 
         document.getElementById("nameInput").value = ""
         document.getElementById("qtyInput").value = ""
         document.getElementById("imgInput").value = ""
+        document.getElementById("details").value = ""
+
+        // Hide the confirm button
+        validateConfirm()
     }
 
     // Item was saved. Called from EITHER newItem or updateItem!
@@ -166,7 +199,7 @@ const Main = () => {
     // either save it or add it
     async function saveToDB()
     {
-            await axios.post(`http://localhost:9000/addItem/${curItem.name}/${curItem.qty}/${curItem.id}`, form,
+            await axios.post(`http://localhost:9000/addItem`, form,
             {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -177,7 +210,7 @@ const Main = () => {
             getItems();
             form.delete('image') // Remove the image reference once uploaded
             
-            return response.data._id;
+            return response.data._id; //return the id to save locally
           })
           .catch(function (response) {
             //handle error
@@ -194,32 +227,36 @@ const Main = () => {
         showPage("page-view");
     }
 
-    //Updated item details
+    //Updated item name
     function updateItemName(event)
     {
-        
+        validateConfirm() // show or hide the confirm button
+
         if (event.target.value)
         {
-            setValidName(true);
-
+            form.set('name', event.target.value)
+            setForm(form)
    
 
             curItem.name = event.target.value;
             let newItem = Object.assign({}, curItem);
             setCurItem(newItem);
             
-            if (validQty)
-            {
-                document.getElementById("confirm-item").style.display = "block";
-            }
+        }
+    }
+
+    //Updated item details 
+    function updateItemDetails(event)
+    {
+
+        form.set('details', event.target.value)
+        setForm(form)
+
+
+        curItem.details = event.target.value;
+        let newItem = Object.assign({}, curItem);
+        setCurItem(newItem);
             
-        }
-        else 
-        {
-            setValidName(false);
-            document.getElementById("confirm-item").style.display = 'none';
-        
-        }
     }
 
     //Update item qty
@@ -227,24 +264,16 @@ const Main = () => {
     {
         
         // verify numerical
+        validateConfirm()
+
         if (event.target.value)
         {
-            setValidQty(true);
-
+            form.set('qty', event.target.value)
+            setForm(form)
 
             curItem.qty = event.target.value;
             let newItem = Object.assign({}, curItem);
             setCurItem(newItem);
-
-            if (validName)
-            {
-                document.getElementById("confirm-item").style.display = "block";
-            }
-        }
-        else 
-        {
-            setValidQty(false);
-            document.getElementById("confirm-item").style.display = 'none';
         }
     }
 
@@ -258,12 +287,14 @@ const Main = () => {
         
         // Database image storage prep
         form.set('image', img, img.name)
+        // set the previous image path so we can delete it
+        form.set('prevImg', curItem.img)
         setForm(form)
 
         // Local image storage
         // image will point to local image until it gets stored on server at which point it will read from server
-        let src = URL.createObjectURL(img);
-        curItem.img = src;
+        let localsrc = URL.createObjectURL(img);
+        curItem.img = localsrc;
         let newItem = Object.assign({}, curItem);
         setCurItem(newItem);
         
@@ -281,19 +312,6 @@ const Main = () => {
             getItems();
             showPage("page-view");
           });
-
-        // For now I will copy the array without it and set it with state
-
-        //const before = items.slice(0, curItem.index);
-        //const after = items.slice(curItem.index + 1);
-        
-        // Will call refresh because refresh uses callback hook that depends on items!!!!!!!!!!
-        //setItems( before.concat(after) );
-
-        //showPage("page-view");
-        //getItems(); // reload from DB?
-        // This should call refresh, because state has changed (items), so refresh will then update item indeces!
-        // This resolves gaps. (i.e. deleting index 1 previously left [0, 2] now 2 gets re indexed to 1.)
     }
 
     return (
@@ -317,28 +335,39 @@ const Main = () => {
                 </div>
 
                 <div id = "form-entry">
-                    <form>
-                        <div className="form-group">
-                            <label >Name</label>
-                            <input type="text" className="form-control" id="nameInput" onInput={updateItemName} placeholder="Enter a name!"></input>
-                        </div>
-
-                        <div className="form-group">
-                            <label >Quantity</label>
-                            <input type="number" className="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Upload Image</label>
-                            <input type="file" className="form-control" id="imgInput" name = "imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
-                        </div>
-                        
-                            <div class = "form-group" id = "modify-item-btns">
-                                <button type="button" className="btn btn-outline-danger" id = "delete-item" onClick = {deleteItem}>Delete </button>
-                                <button type="button" className="btn btn-outline-success" id = "confirm-item" onClick = {saveItem}>Confirm</button>
+                    <div id = "left-entry">
+                        <form>
+                            <div className="form-group">
+                                <label >Name</label>
+                                <input type="text" className="form-control" id="nameInput" onInput={updateItemName} placeholder="Enter a name!"></input>
                             </div>
-                    </form>
+
+                            <div className="form-group">
+                                <label >Quantity</label>
+                                <input type="number" className="form-control" id="qtyInput" onInput={updateItemQty} placeholder="Enter a quantity!" ></input>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Upload Image</label>
+                                <input type="file" className="form-control" id="imgInput" name = "imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
+                            </div>
+                            
+                                <div class = "form-group" id = "modify-item-btns">
+                                    <button type="button" className="btn btn-outline-danger" id = "delete-item" onClick = {deleteItem}>Delete </button>
+                                    <button type="button" className="btn btn-outline-success" id = "confirm-item" onClick = {saveItem}>Confirm</button>
+                                </div>
+                                
+                        </form>
+                    </div>
+
+                    <div class="form-group" id = "desc">
+                        <label>Details:</label>
+                        <textarea class="form-control" rows="10" cols="58" id="details" onInput={updateItemDetails}></textarea>
+                    </div> 
+                    
                 </div>
+
+                
 
             </div>
         </div>

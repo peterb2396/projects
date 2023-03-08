@@ -56,7 +56,7 @@ const NavBar = props => {
     
             <div className="container-fluid">
                 <div id = "left-nav">
-                <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
+                <img src="listicon.png" alt="My Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                 
                 <div className="dropdown">
                     <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -103,7 +103,7 @@ const NavBar = props => {
     
             <div className="container-fluid">
               <a className="navbar-brand" href="!#">
-                <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
+                <img src="listicon.png" alt="My Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                 Modifying Item
               </a>
             
@@ -129,7 +129,7 @@ const NavBar = props => {
     
             <div className="container-fluid">
                 <div id = "left-nav">
-                    <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
+                    <img src="listicon.png" alt="My Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                     
                     <div className="dropdown">
                         <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -156,7 +156,7 @@ const NavBar = props => {
 
         <div className="container-fluid">
             <div id = "left-nav">
-                <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
+                <img src="listicon.png" alt="My Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                 
                 <div className="dropdown">
                     <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

@@ -104,16 +104,31 @@ width:400px;
 	display:inline-block;
 	position: absolute;
 	top:100px;
+}
 
+#desc {
+	padding-left:160px;
+	display:inline-block;
+}
+
+#details {
+	height:294px;
+}
+
+#desc-label {
+	display:block;
+}
+
+
+#left-entry {
+	display:inline-block;
+	vertical-align: top ;
 }
 
 #currentItem {
 	display:inline-block
 }
 
-#confirm-item {
-	display:none
-}
 
 #card {
  max-width: 18rem;
@@ -168,4 +183,12 @@ width:400px;
 #left-nav
 {
 	float:left;
+}
+
+#imgInput, #nameInput, #qtyInput {
+	max-width:300px;
+}
+
+#card-name {
+	max-width: 235px;
 }

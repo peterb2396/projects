@@ -1,5 +1,6 @@
 
 // on amazon instance console, do git clone 
+const fs = require('fs');
 // cd to npx (server)
 // and then do npm install, npm startw
 const multer = require("multer");
@@ -54,6 +55,7 @@ const itemSchema = new mongoose.Schema({
   name: String,
   qty: Number,
   img: String,
+  details: String,
 });
 // Compile schema to a Model (create "Item")
 const Item = mongoose.model('Item', itemSchema);
@@ -72,7 +74,7 @@ const multerStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const ext = file.mimetype.split("/")[1];
-    cb(null, `admin-${file.fieldname}-${Date.now()}.${ext}`);
+    cb(null, `${file.fieldname}-${Date.now()}.${ext}`);
   },
 });
 
@@ -91,13 +93,14 @@ const upload = multer({
 
 //endpoint to add an item to the DB!!!!!
 // server recieved client request.
-app.post('/addItem/:name/:qty/:id', upload.array("image"), add);
+app.post('/addItem', upload.array("image"), add);
 
 function add(req, res)
 {
-  let name = req.params.name;
-  let qty = req.params.qty;
-  let id = req.params.id; //if 'none' we are adding
+  let name = req.body.name;
+  let qty = req.body.qty;
+  let details = req.body.details
+  let id = req.body.id; //if 'none' we are adding
   let img = (req.files.length > 0) ? "http://localhost:9000/images/"+req.files[0].filename: ""
   // the img file, if any, is passed through the FormData object where we can read .files through multer middleware
   
@@ -105,10 +108,10 @@ function add(req, res)
   // doesnt exist so add it
   if (id == "none")
   {
-    const newItem = new Item({"name": name, "qty": qty, "img": img})
+    const newItem = new Item({"name": name, "qty": qty, "img": img, "details": details})
     newItem.save().then(function(value) {
     // THIS IS THE RESPONSE THE CLIENT WILL GET! return the id to them so we can reference this new item without reloading
-    res.json({"name": name, "qty": qty, "img": img, id: value._id}) 
+    res.json({"name": name, "qty": qty, "img": img, "details": details, id: value._id}) 
 })
   }
 
@@ -116,16 +119,18 @@ function add(req, res)
   {
     if (req.files.length === 0) // we are not changing the image
     {
-      Item.findByIdAndUpdate(id, {"name": name, "qty": qty})
+      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "details": details})
         .then(function(value) {
-          res.json({"name": name, "qty": qty, "id": value._id}) 
+          res.json({"name": name, "qty": qty, "details": details, id: value._id}) 
         }) 
     }
-    else // we are updating the image!
+    else // we are updating the image! delete the previous one.
     {
-      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img})
+      deleteByURL(req.body.prevImg)
+
+      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img, "details": details})
         .then(function(value) {
-          res.json({"name": name, "qty": qty, "img": img, "id": value._id})
+          res.json({"name": name, "qty": qty, "img": img, "id": value._id, "details": details})
         })
     }
     
@@ -145,8 +150,18 @@ app.get('/getAllItems', (req,res) => {
 
 })
 
-//delete one item
+// delete one item
+// delete the currentImage as well
 app.get('/delete/:id', (req, res) => {
+
+  // Find the image by this id 
+  Item.findById(req.params.id)
+  .then(function(value) {
+    // delete this image if we got a response
+    if (value)
+      deleteByURL(value.img)
+    
+  })
   
   Item.deleteOne({_id: req.params.id})
   .then(
@@ -154,7 +169,22 @@ app.get('/delete/:id', (req, res) => {
   )
 })
 
+// Delete the given image by web path
+function deleteByURL(url)
+{
+  // do not allow if url is blank because were trying to delete the entire image folder!!
+  if (url == "")
+    return;
 
+
+  // finds the image given by the url on the local machine (server) and tries to delete it
+  fs.unlink(process.cwd() + "/public/" +url.substring( url.indexOf("/images/")), (err) => {
+    if (err) {
+        console.log(err) // we couldnt delete the image from the server, but we should continue to delete item from DB.
+    }
+    // We successfully deleted the old file.
+});
+}
 
 
 async function findAll(myres)
@@ -171,7 +201,6 @@ async function findAll(myres)
 // found the items
 function found(res, myres)
   {
-    //console.log(res)
     myres.json(res)
 
   }
