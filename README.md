@@ -1,5 +1,5 @@
-# frontend-assignment-peterb2396
-Addition lab - adds two numbers through both back and ront end using react.
+# Peter Buonaiuto 518 lab showcase
+This website has a landing page as well as a page for each lab.
 
 My deployed instance address is: 
 ec2-100-26-53-219.compute-1.amazonaws.com:9000
