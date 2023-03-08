@@ -58,13 +58,13 @@ const NavBar = props => {
                 <div id = "left-nav">
                 <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                 
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div className="dropdown">
+                    <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Inventory Database
                     </button>
-                    <ul class="dropdown-menu">
-                        <li><button class="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
-                        <li><button class="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
+                    <ul className="dropdown-menu">
+                        <li><button className="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
+                        <li><button className="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
                        
                     </ul>
                 </div>
@@ -72,17 +72,17 @@ const NavBar = props => {
             
             <div id = "new">
                 <div id = "new1">
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" placeholder="Filter" onChange = {callFilterUpdate}></input>
+                <form className="d-flex" role="search">
+                    <input className="form-control me-2" placeholder="Filter" onChange = {callFilterUpdate}></input>
                     
                 </form>
                 </div>
     
                 <div id = "new-item">
-                    <button class="btn btn-outline-success" onClick = {newItem}>New Item</button>
+                    <button className="btn btn-outline-success" onClick = {newItem}>New Item</button>
                 </div>
                 <div id = "refresh">
-                    <button class="btn btn-outline-success" onClick = {refreshDB}>
+                    <button className="btn btn-outline-success" onClick = {refreshDB}>
                         <img width="20px" alt = "Submit" src = "refresh.png"></img>
                     </button>
                 </div>
@@ -111,7 +111,7 @@ const NavBar = props => {
             <div id = "new">
     
                 <div id = "new2">
-                <button class="btn btn-outline-danger" onClick = {callCancel}>Cancel </button>
+                <button className="btn btn-outline-danger" onClick = {callCancel}>Cancel </button>
                 </div>
             </div>
             
@@ -131,13 +131,13 @@ const NavBar = props => {
                 <div id = "left-nav">
                     <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                     
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div className="dropdown">
+                        <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Addition
                         </button>
-                        <ul class="dropdown-menu">
-                            <li><button class="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
-                            <li><button class="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
+                        <ul className="dropdown-menu">
+                            <li><button className="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
+                            <li><button className="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
                         
                         </ul>
                     </div>
@@ -158,13 +158,13 @@ const NavBar = props => {
             <div id = "left-nav">
                 <img src="https://www.pngmart.com/files/8/List-PNG-Transparent-Picture.png" alt="Bootstrap Logo" width="30" height="24" className="d-inline-block align-text-top"></img>
                 
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div className="dropdown">
+                    <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Welcome!
                     </button>
-                    <ul class="dropdown-menu">
-                        <li><button class="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
-                        <li><button class="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
+                    <ul className="dropdown-menu">
+                        <li><button className="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
+                        <li><button className="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
                     
                     </ul>
                 </div>
@@ -184,4 +184,4 @@ const NavBar = props => {
 }
 
 export default NavBar;
-//<button class="btn btn-outline-success" onClick={search}>Search</button>
+//<button className="btn btn-outline-success" onClick={search}>Search</button>

@@ -3,7 +3,8 @@
 // cd to npx (server)
 // and then do npm install, npm startw
 const multer = require("multer");
-const upload = multer({ dest: "uploads;" });
+
+
 var express = require('express');
 
 var path = require('path');
@@ -18,8 +19,7 @@ app.use(express.json());
 
 // allow access to public and images
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads/', express.static(path.join(__dirname, 'uploads')));
-//app.use (fileupload());
+//app.use('/uploads/', express.static(path.join(__dirname, 'uploads')));
 app.use (express.urlencoded({extended: true}));
 
 //db connection
@@ -65,6 +65,29 @@ const Item = mongoose.model('Item', itemSchema);
 //API endpoints
 
 
+// Image reception handling
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    cb(null, `admin-${file.fieldname}-${Date.now()}.${ext}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.split("/")[1] === "png" || file.mimetype.split("/")[1] === "jpg" || file.mimetype.split("/")[1] === "jpeg") {
+    cb(null, true);
+  } else {
+    cb(new Error("Please upload an image"), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
 
 //endpoint to add an item to the DB!!!!!
 // server recieved client request.
@@ -74,10 +97,9 @@ function add(req, res)
 {
   let name = req.params.name;
   let qty = req.params.qty;
-  let img = req.files[0].filename; // i am now trying to pass through payload rather than uri
-  let id = req.params.id; //if none we are adding
-
-  console.log(req.files[0])
+  let id = req.params.id; //if 'none' we are adding
+  let img = (req.files.length > 0) ? "http://localhost:9000/images/"+req.files[0].filename: ""
+  // the img file, if any, is passed through the FormData object where we can read .files through multer middleware
   
 
   // doesnt exist so add it
@@ -85,20 +107,28 @@ function add(req, res)
   {
     const newItem = new Item({"name": name, "qty": qty, "img": img})
     newItem.save().then(function(value) {
-    // Get the new object, _id is what i want!
-    //console.log(value);
-    // THIS IS THE RESPONSE THE CLIENT WILL GET!
+    // THIS IS THE RESPONSE THE CLIENT WILL GET! return the id to them so we can reference this new item without reloading
     res.json({"name": name, "qty": qty, "img": img, id: value._id}) 
 })
   }
 
-  else // it exists so find the id and update
+  else // it exists so find the id and update the database!
   {
-    Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img})
-    .then(function(value) {
-      //console.log(req.files)
-      res.json({"name": name, "qty": qty, "img": img, "id": value._id}) 
-  }) //id will remain the same
+    if (req.files.length === 0) // we are not changing the image
+    {
+      Item.findByIdAndUpdate(id, {"name": name, "qty": qty})
+        .then(function(value) {
+          res.json({"name": name, "qty": qty, "id": value._id}) 
+        }) 
+    }
+    else // we are updating the image!
+    {
+      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img})
+        .then(function(value) {
+          res.json({"name": name, "qty": qty, "img": img, "id": value._id})
+        })
+    }
+    
     
   }
 }
@@ -121,9 +151,6 @@ app.get('/delete/:id', (req, res) => {
   Item.deleteOne({_id: req.params.id})
   .then(
     res.json({result: "success"})
-  )
-  .catch(
-    res.json({result: "fail"})
   )
 })
 

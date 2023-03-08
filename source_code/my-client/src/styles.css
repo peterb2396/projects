@@ -111,7 +111,9 @@ width:400px;
 	display:inline-block
 }
 
-
+#confirm-item {
+	display:none
+}
 
 #card {
  max-width: 18rem;
@@ -128,6 +130,7 @@ width:400px;
 
 #card-img{
 	margin:auto;
+	object-fit: cover;
 }
 
 #page-update, #page-view, #page-addition

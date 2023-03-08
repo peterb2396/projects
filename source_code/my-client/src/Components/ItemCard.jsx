@@ -19,10 +19,10 @@ const ItemCard = props => {
         return( 
             <div id = "card-border" onClick = {modify}> 
                 
-                <div class="card border-secondary mb-3" id = "card">
-                    <div class="card-header">{(props.item.name)? props.item.name : "Item Name"}</div>
-                    <div class="card-body text-secondary">
-                        <img src = {props.item.img}alt = "Item" width = "200px" height = "200px" id = "card-img"
+                <div className="card border-secondary mb-3" id = "card">
+                    <div className="card-header">{(props.item.name)? props.item.name : "Item Name"}</div>
+                    <div className="card-body text-secondary">
+                        <img src = {props.item.img} alt = "Item" width = "200px" height = "200px" id = "card-img"
                         onError={event => {
                             // Load the default image
                             event.target.src = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg"
@@ -30,7 +30,7 @@ const ItemCard = props => {
                             console.log("failed to load image:", props.item.img)
                           }}></img>
                         <div id = "qty">
-                            <p class="card-text">Quantity:</p>
+                            <p className="card-text">Quantity:</p>
                             <p id = "item-qty">{props.item.qty}</p>
                         </div>
                     </div>
