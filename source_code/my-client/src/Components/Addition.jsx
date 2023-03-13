@@ -32,7 +32,7 @@ const Addition = () => {
 
   async function add() {
     //await axios.get(`http://ec2-100-26-53-219.compute-1.amazonaws.com:9000/add/${nums.num1}/and/${nums.num2}`)
-    await axios.get(`http://localhost:9000/add/${nums.num1}/and/${nums.num2}`)
+    await axios.get(`http://ec2-100-26-53-219.compute-1.amazonaws.com:9000/add/${nums.num1}/and/${nums.num2}`)
       .then((response) => {
         setSum( {...sum, serverSum: response.data.addition} )
       });

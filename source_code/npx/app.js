@@ -178,7 +178,7 @@ function deleteByURL(url)
 
 
   // finds the image given by the url on the local machine (server) and tries to delete it
-  fs.unlink(process.cwd() + "/public/" +url.substring( url.indexOf("/images/")), (err) => {
+  fs.unlink(process.cwd() + "/public" +url.substring( url.indexOf("/images/")), (err) => {
     if (err) {
         console.log(err) // we couldnt delete the image from the server, but we should continue to delete item from DB.
     }
