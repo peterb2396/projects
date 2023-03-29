@@ -1,0 +1,7 @@
+{
+    "java.project.sourcePaths": [
+        "java/abm-paralell",
+        "java/Assignment2",
+        "java/abm-sequential"
+    ]
+}
