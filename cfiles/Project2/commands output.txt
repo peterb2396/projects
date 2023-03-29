@@ -1,0 +1,81 @@
+Last login: Mon Mar  7 14:02:05 on ttys000
+peter@dyn-169-226-81-58 ~ % /Users/peter/Desktop/C\ files/Project\ 2/cmds ; exit;
+Enter a command: ina 7 first_item
+Ok.
+
+Enter a command: prn
+Values in the list are:
+1: first_item
+
+Enter a command: inb 1 zero_item
+Ok.
+
+Enter a command: prn
+Values in the list are:
+1: zero_item
+2: first_item
+
+Enter a command: inb 83 apple
+Text inserted at the beginning.
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: zero_item
+3: first_item
+
+Enter a command: ina -5 orange
+Text inserted at the end.
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: zero_item
+3: first_item
+4: orange
+
+Enter a command: del 2
+Deleted.
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: first_item
+3: orange
+
+Enter a command: rep 3 tangerine
+Replaced.
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: first_item
+3: tangerine
+
+Enter a command: ina 2 tangerine
+Such text exists already: tangerine
+
+Enter a command: del 4
+No such index
+
+Enter a command: rep 5 hello
+No such index
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: first_item
+3: tangerine
+
+Enter a command: ina 2 peaches!
+Ok.
+
+Enter a command: prn
+Values in the list are:
+1: apple
+2: first_item
+3: peaches!
+4: tangerine
+
+Enter a command: end
+Goodbye!

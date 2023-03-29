@@ -1,0 +1,14 @@
+	 #### INITIALIZE COUNT ARRAY
+	 la $s1, Count         # load Count array to s1
+	 li $t1, 0
+	 li $s0, 10
+	 li $t3, 0
+	 
+	#initCount: 
+	 #	beq $t1, $s0, initCountEnd
+	 #	sw $t3, ($s1)       # initialize array item to 0
+	 #	addi $s1, $s1, 4      # next array address
+	 #	addi $t1, $t1, 1        # next array index (counter)
+	 #	j initCount
+	initCountEnd:
+		la $s1, Count          # restore s1 to count's source address
