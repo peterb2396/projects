@@ -3,6 +3,8 @@
 // Mode 1 will show options to cancel an udate
 // Mode 2 is for additions.
 // Mode 3 is for welcome page
+import { Link } from "react-router-dom";
+
 const NavBar = props => {
 
     //Call filter update in the main page thru the prop function
@@ -48,8 +50,8 @@ const NavBar = props => {
                         Inventory Database
                     </button>
                     <ul className="dropdown-menu">
-                        <li><a href = "/" key = "0">Welcome</a></li>
-                        <li><a href = "/addition" key = "1">Addition</a></li>
+                        <li><Link to = "/" key = "0">Welcome</Link></li>
+                        <li><Link to = "/addition" key = "1">Addition</Link></li>
                        
                     </ul>
                 </div>
@@ -121,8 +123,8 @@ const NavBar = props => {
                             Addition
                         </button>
                         <ul className="dropdown-menu">
-                            <li><a href = "/" key = "0">Welcome</a></li>
-                            <li><a href = "/inventory" key = "1">Inventory</a></li>
+                            <li><Link to = "/" key = "0">Welcome</Link></li>
+                            <li><Link to = "/inventory" key = "1">Inventory</Link></li>
                         
                         </ul>
                     </div>
@@ -148,8 +150,8 @@ const NavBar = props => {
                         Welcome!
                     </button>
                     <ul className="dropdown-menu">
-                        <li><a href = "/inventory" key = "0">Inventory</a></li>
-                        <li><a href = "/addition" key = "1">Addition</a></li>
+                        <li><Link to = "/inventory" key = "0">Inventory</Link></li>
+                        <li><Link to = "/addition" key = "1">Addition</Link></li>
                     
                     </ul>
                 </div>

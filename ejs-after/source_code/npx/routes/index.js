@@ -5,8 +5,9 @@ const fs = require('fs');
 
 //Backend routes (endpoints)
 
-const host = "http://localhost:3001"
-//const host = "http://3.232.168.176:3001"
+//const host = "http://localhost:3001"
+const host = "http://3.232.168.176:3001"
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

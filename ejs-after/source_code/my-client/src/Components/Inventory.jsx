@@ -9,7 +9,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 const Inventory = () => {
 
     const [items, setItems] = useState([]);
-    var host = "http://localhost:3001"
+    //var host = "http://localhost:3001"
+    const host = "http://3.232.168.176:3001"
 
 
     const [curItem, setCurItem] = useState(items[0]);

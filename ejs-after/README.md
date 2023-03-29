@@ -1,5 +1,6 @@
 # ejs version
 I have switched to ejs, by request of Yasaswi
+Recently have converted this system to page based and fixed client side routing errors with a catch-all redirection method 
 
 sudo apt updaste
 sudo apt install npm
