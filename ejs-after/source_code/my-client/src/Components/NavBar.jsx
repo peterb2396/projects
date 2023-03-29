@@ -19,21 +19,6 @@ const NavBar = props => {
     }
 
 
-    //Navigating between pages
-    function gotoAddition()
-    {
-        props.showPage("page-addition")
-    }
-    function gotoInventory()
-    {
-        refreshDB();
-        props.showPage("page-view")
-    }
-    function gotoWelcome()
-    {
-        props.showPage("page-welcome")
-    }
-
     //Clicked cancel
     function callCancel()
     {
@@ -63,8 +48,8 @@ const NavBar = props => {
                         Inventory Database
                     </button>
                     <ul className="dropdown-menu">
-                        <li><button className="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
-                        <li><button className="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
+                        <li><a href = "/" key = "0">Welcome</a></li>
+                        <li><a href = "/addition" key = "1">Addition</a></li>
                        
                     </ul>
                 </div>
@@ -111,7 +96,7 @@ const NavBar = props => {
             <div id = "new">
     
                 <div id = "new2">
-                <button className="btn btn-outline-danger" onClick = {callCancel}>Cancel </button>
+                    <button className="btn btn-outline-danger" onClick = {callCancel}>Cancel </button>
                 </div>
             </div>
             
@@ -136,8 +121,8 @@ const NavBar = props => {
                             Addition
                         </button>
                         <ul className="dropdown-menu">
-                            <li><button className="btn btn-link" onClick = {gotoWelcome}>Welcome</button></li>
-                            <li><button className="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
+                            <li><a href = "/" key = "0">Welcome</a></li>
+                            <li><a href = "/inventory" key = "1">Inventory</a></li>
                         
                         </ul>
                     </div>
@@ -163,8 +148,8 @@ const NavBar = props => {
                         Welcome!
                     </button>
                     <ul className="dropdown-menu">
-                        <li><button className="btn btn-link" onClick = {gotoAddition}>Addition</button></li>
-                        <li><button className="btn btn-link" onClick = {gotoInventory}>Iventory</button></li>
+                        <li><a href = "/inventory" key = "0">Inventory</a></li>
+                        <li><a href = "/addition" key = "1">Addition</a></li>
                     
                     </ul>
                 </div>

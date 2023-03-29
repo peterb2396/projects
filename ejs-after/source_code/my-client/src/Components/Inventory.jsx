@@ -1,26 +1,28 @@
-import React, { useState, useEffect} from "react";
-import NavBar from './Components/NavBar.jsx'
-import ItemCard from './Components/ItemCard.jsx'
-import Addition from "./Components/Addition.jsx";
-import 'bootstrap/dist/css/bootstrap.css';
-import './styles.css';
+
 import axios from 'axios';
 import FormData from 'form-data';
+import React, { useState, useEffect} from "react";
+import NavBar from './NavBar.jsx'
+import ItemCard from './ItemCard.jsx'
+import 'bootstrap/dist/css/bootstrap.css';
 
-const Main = () => {
-    const host = "http://3.228.10.247:3001"
-    //const host = "http://localhost:9000"
-     
-    // items reflects our database. When it changes we refreshList() through the callback hook on this variable
+const Inventory = () => {
+
     const [items, setItems] = useState([]);
+    var host = "http://localhost:3001"
+
 
     const [curItem, setCurItem] = useState(items[0]);
-    const [curPage, setCurPage] = useState("page-welcome");
+    const [curPage, setCurPage] = useState("page-view");
     const [itemComponents, setItemComponents] = useState();
     const [filter, setFilter] = useState("");
 
-    //const [imgData, setimgData] = useState({});
-    //let form;
+    // Try to load the items on the first refresh
+    if (items.length === 0)
+    {
+        getItems()
+    }
+
     let dummy = new FormData();
     const [form, setForm] = useState(dummy)
     
@@ -313,7 +315,7 @@ const Main = () => {
     {
         
         // Tell server to tell DB to remove this item (curItem)
-        await axios.get(`${host}/delete/${curItem.id}`)
+        await axios.get(`${process.env.MYHOST}/delete/${curItem.id}`)
         .then((response) => {
             
             getItems(curItem.id);
@@ -321,9 +323,15 @@ const Main = () => {
           });
     }
 
+
+    
+
     return (
     // MAIN VIEW PAGE
+
+    
     <div id = "content-border">
+
         <div className="card border-secondary mb-3" id = "page-view">
             <div className="card-header"><NavBar mode="0" newItem={newItem} updateFilter={updateFilter} showPage={showPage} refreshDB={getItems}></NavBar></div>
             <div className="card-body text-secondary"  id = "content">
@@ -359,7 +367,7 @@ const Main = () => {
                                 <input type="file" className="form-control" id="imgInput" name = "imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
                             </div>
                             
-                                <div class = "form-group" id = "modify-item-btns">
+                            <div className = "form-group" id = "modify-item-btns">
                                     <button type="button" className="btn btn-outline-danger" id = "delete-item" onClick = {deleteItem}>Delete </button>
                                     <button type="button" className="btn btn-outline-success" id = "confirm-item" onClick = {saveItem}>Confirm</button>
                                 </div>
@@ -367,9 +375,9 @@ const Main = () => {
                         </form>
                     </div>
 
-                    <div class="form-group" id = "desc">
+                    <div className ="form-group" id = "desc">
                         <label>Details:</label>
-                        <textarea class="form-control" rows="10" cols="58" id="details" onInput={updateItemDetails}></textarea>
+                        <textarea className ="form-control" rows="10" cols="58" id="details" onInput={updateItemDetails}></textarea>
                     </div> 
                     
                 </div>
@@ -378,32 +386,13 @@ const Main = () => {
 
             </div>
         </div>
-
-        <div className="card border-secondary mb-3" id = "page-addition" >
-            <div className="card-header"><NavBar mode="2" showPage={showPage}refreshDB={getItems}></NavBar></div>
-                <div className="card-body text-secondary"  id = "content">
-                    <Addition/>
-                </div>
-
-
-        </div>
-
-
-        <div className="card border-secondary mb-3" id = "page-welcome" >
-
-            <div className="card-header"><NavBar mode="3" showPage={showPage} refreshDB={getItems}></NavBar></div>
-                    <div className="card-body text-secondary"  id = "content">
-                        Welcome!
-                    </div>
-        </div>
-
-
     </div>
     
   
 
     )
 
+
 }
 
-export default Main;
+export default Inventory;

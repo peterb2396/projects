@@ -3,8 +3,10 @@ var router = express.Router();
 const multer = require("multer");
 const fs = require('fs');
 
-//const host = "http://localhost:3001"
-const host = "http://3.228.10.247:3001"
+//Backend routes (endpoints)
+
+const host = "http://localhost:3001"
+//const host = "http://3.232.168.176:3001"
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -34,15 +36,6 @@ async function connect(){
 
 
 connect();
-
-
-// const PORT = process.env.PORT || 3001;
-
-// app.listen(PORT, () => {
-//   console.log(`Server listening on ${PORT}`);
-// }
-// )
-
 
 // Set up DB!
 

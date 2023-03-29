@@ -148,7 +148,7 @@ width:400px;
 	object-fit: cover;
 }
 
-#page-update, #page-view, #page-addition
+#page-update
 {
 	display:none;
 }
@@ -179,6 +179,7 @@ width:400px;
 	display:inline-block;
 	padding-left: 20px;
 }
+
 
 #left-nav
 {
