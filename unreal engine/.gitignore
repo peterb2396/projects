@@ -1,4 +1,4 @@
 /*
 !.gitignore
 !README.md
-!SimpleCalculator/SimpleCalc/Content/
+!SimpleCalculator/SimpleCalc/Content/*
