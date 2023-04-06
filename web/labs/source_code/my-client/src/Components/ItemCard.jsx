@@ -1,20 +1,24 @@
-import React, { useEffect} from "react";
+import React from "react";
+
 const ItemCard = props => {
 
-    useEffect(() => {    
-
-    },  [props.item]);
-
+    
+    
     //When we click, send this item as a ref
     function modify()
     {
         if (props.edit && props.item)
             props.edit(props.item);
+        
+        
     }
 
     
-    if (props.item)
+
+    
+    if (props.item && props.host)
     {
+        
         //testImage(props.item.img); //go through test first to verify image or assign NA image {props.item.img}
         return( 
             <div id = "card-border" onClick = {modify}> 

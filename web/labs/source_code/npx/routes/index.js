@@ -5,8 +5,10 @@ const fs = require('fs');
 
 //Backend routes (endpoints)
 
+//host always should be this
 const host = "http://localhost:3001"
 //const host = "http://3.232.168.176:3001"
+
 
 
 /* GET home page. */
@@ -24,7 +26,9 @@ router.get('/add/:firstNumber/and/:secondNumber', (req,res)=>{
 
 
 var mongoose = require('mongoose');
-const uri = 'mongodb+srv://peterbuo:m3x93WLJhWFagQP@inventorysite.lbmkkjb.mongodb.net/?retryWrites=true&w=majority'
+//const uri = 'mongodb+srv://peterbuo:m3x93WLJhWFagQP@inventorysite.lbmkkjb.mongodb.net/?retryWrites=true&w=majority' //atlas
+const uri = 'mongodb://127.0.0.1:27017' //local
+
 async function connect(){
   try {
     await mongoose.connect(uri)
@@ -47,6 +51,9 @@ const itemSchema = new mongoose.Schema({
   img: String,
   details: String,
   op: String,
+  editor: String,
+  postdate: String,
+  editdate: String,
 });
 // Compile schema to a Model (create "Item")
 const Item = mongoose.model('Item', itemSchema);
@@ -155,11 +162,15 @@ function getId(req, res)
 
 // given id get name
 router.post('/get-name', getName)
-function getName(req, res)
+async function getName(req, res)
 {
-  User.findById(req.body.id)
+  await User.findById(req.body.id)
   .then(function(value) {
     res.json({'username': value?.username})
+  })
+  .catch((result) => {
+    // No id provided, usually when a user is logged out!
+    res.json({'username': "ANONYMOUS"})
   })
 }
 
@@ -183,6 +194,8 @@ function add(req, res)
   let qty = req.body.qty;
   let details = req.body.details
   let op = req.body.op
+  let editor = req.body.editor
+  let date = req.body.date
   let id = req.body.id; //if 'none' we are adding
   let img = (req.files.length > 0) ? host+"/images/"+req.files[0].filename: ""
   // the img file, if any, is passed through the FormData object where we can read .files through multer middleware
@@ -191,7 +204,7 @@ function add(req, res)
   // doesnt exist so add it
   if (id == "none")
   {
-    const newItem = new Item({"name": name, "qty": qty, "img": img, "details": details, "op": op})
+    const newItem = new Item({"name": name, "qty": qty, "img": img, "details": details, "op": op, "postdate": date})
     newItem.save().then(function(value) {
     // THIS IS THE RESPONSE THE CLIENT WILL GET! return the id to them so we can reference this new item without reloading
     res.json({"name": name, "qty": qty, "img": img, "details": details, id: value._id}) 
@@ -201,17 +214,39 @@ function add(req, res)
   else // it exists so find the id and update the database!
   {
     if (req.files.length === 0) // we are not changing the image
-    {
-      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "details": details})
+    { // Only update if something has changed
+      // If this exact item exists it was not updated
+      Item.findOne({"_id": id, "name": name, "qty": qty, "details": details})
+      .then(function(value) {
+        if (value)
+        {
+          res.json({'response': "nothing to change!"})
+          // we are done here, abort change because nothing changes
+        }
+        else
+        {
+          // We didnt find an exact match which means we must update something!
+          Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "details": details, "editor": editor, "editdate": date})
         .then(function(value) {
           res.json({"name": name, "qty": qty, "details": details, id: value._id}) 
         }) 
+        .catch((res) => {
+          console.log("catch")
+        })
+
+
+        }
+      }) 
+      .catch((res) => {
+        console.log("catch")
+      })
+
     }
     else // we are updating the image! delete the previous one.
     {
       deleteByURL(req.body.prevImg)
 
-      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img, "details": details})
+      Item.findByIdAndUpdate(id, {"name": name, "qty": qty, "img": img, "details": details, "editor": editor})
         .then(function(value) {
           res.json({"name": name, "qty": qty, "img": img, "id": value._id, "details": details})
         })

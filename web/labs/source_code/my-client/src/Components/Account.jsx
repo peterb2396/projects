@@ -6,7 +6,8 @@ import { useNavigate } from 'react-router-dom';
 const Account = (props) => 
 {
     //const host = "http://3.232.168.176:3001"
-    const host = "http://localhost:3001"
+    //const host = "http://localhost:3001"
+    const host = props.host
 
     const navigate = useNavigate();
     loadAccount() // fetch current details

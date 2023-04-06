@@ -9,8 +9,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 const Inventory = (props) => {
 
     const [items, setItems] = useState([]);
-    const host = "http://localhost:3001"
-    
+    //const host = "http://localhost:3001"
+    const host = props.host
     //const host = "http://3.232.168.176:3001"
 
     const [curItem, setCurItem] = useState(items[0]);
@@ -18,37 +18,47 @@ const Inventory = (props) => {
     const [itemComponents, setItemComponents] = useState();
     const [filter, setFilter] = useState("");
     const [myid, setid] = useState("")
+    const [op, setOp] = useState("")
+    const [editor, setEditor] = useState("")
+    const [first, setFirst] = useState(true)
 
     // Try to load the items on the first refresh
-    if (items.length === 0)
+    if (first)
     {
         getItems()
         storeID()
+        setFirst(false)
     }
 
     let dummy = new FormData();
     const [form, setForm] = useState(dummy)
 
     //store this user's id from their token
+    // used to note them as the author when posting
     function storeID()
     {
         let data = {'username': props.token()}
 
         axios.post(`${host}/get-id`, data)
         .then(function (response) {
-            setid(response.data.id) //return the id to store as a token on the site?
+            setid(response.data.id) 
         })
     }
 
-    // //retrieve user's name by their id
-    // function getNameByID(id)
-    // {
-    //     let data = {'id': id}
-    //     axios.post(`${host}/get-name`, data)
-    //     .then(function (response) {
-    //         return (response.data.username) //return the id to store as a token on the site?
-    //     })
-    // }
+    //get the username of the creator of this item
+    // also used to get the last editor
+    // pass 0 if op, pass 1 if last editor
+    const setName = React.useCallback(async (id, key) =>
+    {
+        let data = {'id': id}
+        await axios.post(`${props.host}/get-name`, data)
+        .then((response) =>{
+            if (key === 0)
+                setOp(response.data.username) //return the id to store as a token on the site?
+            else
+                setEditor(response.data.username)
+        })
+    }, [props.host])
     
     
 
@@ -71,6 +81,11 @@ const Inventory = (props) => {
     const updateItem = React.useCallback((item) =>
 
     {
+        
+        // Store the OP and editor of this item
+        setName(item.op, 0)
+        setName(item.editor, 1)
+
         // We can delete , bc it does exist here!
         document.getElementById("delete-item").style.display = 'block';
         
@@ -83,6 +98,8 @@ const Inventory = (props) => {
 
         // Set the default data for if we confirm these changes
         form.set('qty', item.qty)
+        form.set('op', item.op)
+        form.set('editor', myid) //This will immediately become my id because i am the editor
         form.set('name', item.name)
         form.set('id', item.id)
         form.set('details', item.details)
@@ -101,7 +118,7 @@ const Inventory = (props) => {
         validateConfirm()
 
 
-    }, [showPage, form])
+    }, [showPage, form, setName, myid])
 
     // Refresh the view, does NOT update from DB! That occurs when we add, delete, modify or refresh.
     // here is where we display warning for no items if that is the case
@@ -125,7 +142,7 @@ const Inventory = (props) => {
             // If there's no filter or if this element satisfies the filter
             if (items[i].name.toLowerCase().indexOf(filter.toLowerCase()) > -1) 
             {
-                comps.push(<ItemCard item = {items[i]} edit = {updateItem} key={i} />)
+                comps.push(<ItemCard host = {host} item = {items[i]} edit = {updateItem} key={i} />)
             }
         }
         
@@ -133,7 +150,7 @@ const Inventory = (props) => {
         setItemComponents(comps);
         
       
-    }, [filter, items, updateItem])
+    }, [filter, items, updateItem, host])
 
     //ask the server to Get items from DB (reload)
     // ignore the last deleted id
@@ -145,10 +162,9 @@ const Inventory = (props) => {
             let newArray = []
             response.data.forEach((item, index) => 
             {
-                if (!newArray.includes({name: item.name, qty: item.qty, img: item.img, id: item._id}) && (item._id !== ignore))
-                {
-                    newArray.push({name: item.name, qty: item.qty, img: item.img, id: item._id, details: item.details, op: item.op})
-                }
+                if ((item._id !== ignore))
+                    newArray.push({name: item.name, qty: item.qty, img: item.img, id: item._id, details: item.details, op: item.op, editor: item.editor, editdate: item.editdate, postdate: item.postdate})
+                
             })
             setItems(newArray)// not doing anything?
             refreshList(); // Populate the list with our items array from DB
@@ -193,6 +209,7 @@ const Inventory = (props) => {
     function newItem()
     
     {
+        
         // We cant delete , bc it doesnt exist yet!
         document.getElementById("delete-item").style.display = 'none';
 
@@ -233,9 +250,17 @@ const Inventory = (props) => {
     
 
     // Save the current item to the database and return the unique id and then store it here so we can delete or modify it
-    // either save it or add it
+    // either save it or add it - get current time
     async function saveToDB()
     {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        var date = mm + '/' + dd + '/' + yyyy;
+        form.set('date', date)
+
         await axios.post(`${host}/addItem`, form,
         {
             headers: {
@@ -374,7 +399,7 @@ const Inventory = (props) => {
             <div className="card-header"><NavBar token = {props.token} mode="1" cancelUpdate={cancelUpdate} refreshDB={getItems}></NavBar></div>
             <div className="card-body text-secondary"  id = "content">
                 <div id = "currentItem">
-                    <ItemCard item = {curItem} id = "curItemPreview"/>
+                    <ItemCard host = {host} item = {curItem} id = "curItemPreview"/>
                 </div>
 
                 <div id = "form-entry">
@@ -393,6 +418,11 @@ const Inventory = (props) => {
                             <div className="form-group">
                                 <label>Upload Image</label>
                                 <input type="file" className="form-control" id="imgInput" name = "imgInput" accept=".png, .jpg, .jpeg" onInput={updateItemImg}/>
+                            </div>
+
+                            <div>
+                                <label>{(curItem?.op && curItem?.id !== "none")? `Posted by ${op} on ${curItem.postdate}`: ``}</label><br/>
+                                <label>{(curItem?.editor)? `Edited by ${editor} on ${curItem.editdate}`: ``}</label>
                             </div>
                             
                             <div className = "form-group" id = "modify-item-btns">

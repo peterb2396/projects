@@ -7,7 +7,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 // ADDITION COMPONENT (PAGE)
 const Addition = (props) => {
   //const host = "http://3.232.168.176:3001"
-  const host = "http://localhost:3001"
+  //const host = "http://localhost:3001"
+  const host = props.host
 
   const [sum, setSum] = useState({ clientSum: 0, serverSum: 0});
   const [nums, setNums] = useState({ num1: 0, num2: 0 });

@@ -54,7 +54,7 @@ const NavBar = props => {
                     
                         <div className="dropdown">
                             <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Inventory Database
+                                {`Inventory Database${props.token()? ` (${props.token()})`: ``}`}
                             </button>
                             <ul className="dropdown-menu">
                                 <li><Link to = "/" key = "0">Welcome</Link></li>
@@ -63,7 +63,7 @@ const NavBar = props => {
                             
                             </ul>
                         </div>
-                    <p id = "usernameDisplay">{props.token()? props.token(): noLoginDisplay}</p>
+                    <p id = "usernameDisplay">{props.token()? "": noLoginDisplay}</p>
 
                 </div>
             
@@ -130,7 +130,7 @@ const NavBar = props => {
                     
                     <div className="dropdown">
                         <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Addition
+                            {`Addition${props.token()? ` (${props.token()})`: ``}`}
                         </button>
                         <ul className="dropdown-menu">
                             <li><Link to = "/" key = "0">Welcome</Link></li>
@@ -141,7 +141,7 @@ const NavBar = props => {
                     </div>
                 </div>
 
-                <p id = "usernameDisplay">{props.token()? props.token(): noLoginDisplay}</p>
+                <p id = "usernameDisplay">{props.token()? "": noLoginDisplay}</p>
             
             </div>
         </nav>
@@ -160,7 +160,7 @@ const NavBar = props => {
                 
                 <div className="dropdown">
                     <button className="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {`Welcome${props.token()? `, ${props.token()}`: ``}!`}
+                        {`Welcome${props.token()? `, ${props.token()}`: ``}`}
                     </button>
                     <ul className="dropdown-menu">
                         <li><Link to = "/inventory" key = "0">Inventory</Link></li>

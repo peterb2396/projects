@@ -6,8 +6,9 @@ import axios from 'axios';
 
 export default function Login(props) {
 
-    const host = "http://localhost:3001"
+    //const host = "http://localhost:3001"
     //const host = "http://3.232.168.176:3001"
+    const host = props.host
     
     const AUTH_LOGIN = "Login"
     const AUTH_SIGNUP = "Sign up"
@@ -74,6 +75,8 @@ export default function Login(props) {
         await axios.post(`${host}/signup`, data)
           .then(function (response) {
             props.setToken(response.data.username)
+            // After signing up we log in (set the token) and navigate back to the home page
+            navigate('/');
           })
           .catch(function (response) {
             //handle error
@@ -92,9 +95,6 @@ export default function Login(props) {
     function validateData()
 
     {
-
-        
-
         let valid = true
         // return false if no password is present
         if (! document.getElementById("passwordInput").value || ! document.getElementById("usernameInput").value)
