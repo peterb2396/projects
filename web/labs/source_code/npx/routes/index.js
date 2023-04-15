@@ -5,9 +5,7 @@ const fs = require('fs');
 
 //Backend routes (endpoints)
 
-//host always should be this
 const host = "http://localhost:3001"
-//const host = "http://3.232.168.176:3001"
 
 
 
@@ -26,8 +24,8 @@ router.get('/add/:firstNumber/and/:secondNumber', (req,res)=>{
 
 
 var mongoose = require('mongoose');
-//const uri = 'mongodb+srv://peterbuo:m3x93WLJhWFagQP@inventorysite.lbmkkjb.mongodb.net/?retryWrites=true&w=majority' //atlas
-const uri = 'mongodb://127.0.0.1:27017' //local
+const uri = 'mongodb+srv://peterbuo:m3x93WLJhWFagQP@inventorysite.lbmkkjb.mongodb.net/?retryWrites=true&w=majority' //atlas
+//const uri = 'mongodb://mongo:27017' //local
 
 async function connect(){
   try {
@@ -209,6 +207,9 @@ function add(req, res)
     // THIS IS THE RESPONSE THE CLIENT WILL GET! return the id to them so we can reference this new item without reloading
     res.json({"name": name, "qty": qty, "img": img, "details": details, id: value._id}) 
 })
+  .catch(function(error) {
+    console.log("ADDING ITEM FAILED: ", error)
+  })
   }
 
   else // it exists so find the id and update the database!

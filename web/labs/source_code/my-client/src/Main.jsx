@@ -22,9 +22,6 @@ fetch(raw)
   setHost(copy)
 });
 
-//const host = "http://3.232.168.176:3001"
-console.log(host)
-
   function setToken(userToken) {
     // Store the username as a token to display and allow logged-in-features
     sessionStorage.setItem('token', userToken);
