@@ -1,8 +1,16 @@
-import cv2
+import cv2, os
 import numpy as np
 import pytesseract
+from pytesseract import Output
 
-debug = True
+debug = False
+inputs = 'crop-forms'
+# All files in the directory will be converted and shown.
+
+def is_image_file(path):
+    extension = os.path.splitext(path)[1].lower()
+    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'}
+    return extension in image_extensions
 
 def crop(path):
     # Load the image
@@ -92,7 +100,19 @@ def crop(path):
         cv2.destroyAllWindows()
 
     '''Fix the warping of the image '''
-    # Define the four points of the original image
+    
+    # default to good rotation
+    bad_rot = False
+    # if bl/tl are swapped, fix them to resolve rotation errors
+    if (b[1] > new_img.shape[1] / 2): # we need to swap BL and TL coords
+        bad_rot = True
+        temp = b # save a so we dont loose it 
+
+        b = c
+        c = d
+        d = a
+        a = temp
+            
 
     src = np.array([[b[0], b[1]], [a[0], a[1]],[d[0], d[1]],[c[0], c[1]]])
     dest = np.array([[0,0],[width,0],[width,height],[0,height]])
@@ -101,29 +121,36 @@ def crop(path):
     M, _ = cv2.findHomography(src, dest)
 
     # Apply perspective correction to the image
-    img_corrected = cv2.warpPerspective(new_img, M, (width,height))
+    img_corrected = cv2.warpPerspective(new_img, M, (round(width), round(height)))
+
+    # Fix rotation error 
+    if bad_rot:
+        img_corrected = cv2.rotate(img_corrected, cv2.ROTATE_180)
 
     ''' Make sure the image is the right 90 degree orientation'''
-
-    # Convert the image to grayscale
     gray = cv2.cvtColor(img_corrected, cv2.COLOR_BGR2GRAY)
+    # Perform OCR on the image and get the OSD information
+    osd = pytesseract.image_to_osd(gray, output_type=Output.DICT)
 
-    # Detect the orientation of the text using Tesseract
-    orientation = pytesseract.image_to_osd(gray)
+    # Extract the rotation angle from the OSD information
+    angle = int(osd['orientation'])
 
-    # Extract the rotation angle from the orientation string
-    angle = int(orientation.split('\n')[1].split(':')[-1])
+   # Check if the image is rotate
+    if debug:
+        if angle == 0:
+            print('The image is straight.')
+        else:
+            print(f'The image is rotated {angle} degrees.')
 
     # Rotate the image to the correct orientation
     if angle > 250 and angle < 290:
         img_corrected = cv2.rotate(img_corrected, cv2.ROTATE_90_CLOCKWISE)
-        img_corrected = cv2.resize(img_corrected, (width, height))
     elif angle > 160 and angle < 200:
         img_corrected = cv2.rotate(img_corrected, cv2.ROTATE_180)
     elif angle > 70 and angle < 110:
         img_corrected = cv2.rotate(img_corrected, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        img_corrected = cv2.resize(img_corrected, (width, height))
 
+    img_corrected = cv2.resize(img_corrected, (round(width), round(height)))
 
     ''' Show the results '''
     
@@ -131,8 +158,12 @@ def crop(path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-crop('paper.jpg')
-#crop('1.jpg')
-#crop('2.png')
-#crop('3.png')
-crop('4.png')
+for filename in os.listdir(inputs):
+    f = os.path.join(inputs, filename)
+
+# proceed if it is an image
+    if is_image_file(f):
+        crop(f)
+
+# NOTE: if you want to use custom output image size, pass through to crop instead of hardcoding. If you do this, you may need 
+# to delete the bad_rot variable and no longer do the 180 deg rotation when finding bad rots.
