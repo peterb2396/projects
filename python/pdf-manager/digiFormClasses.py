@@ -1,7 +1,23 @@
-from pdfManager import PdfGenerator, PdfReader
+from pdf_simulator import PdfGenerator, PdfReader
 from pdfStructure import *
 from datetime import datetime
 import os, time, shutil
+import boto3
+
+# Initialize the S3 client
+s3 = boto3.client('s3', aws_access_key_id='AKIAVXBO2IXZKY5J2FN5', aws_secret_access_key='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')
+
+# Set the S3 bucket and key for the image
+bucket_name = 'ms-inventory-management'
+
+# Delete all objects from the bucket
+# List all objects in the bucket
+response = s3.list_objects(Bucket=bucket_name)
+if 'Contents' in response:
+    objects = response['Contents']
+    # Delete all objects from the bucket
+    for obj in objects:
+        s3.delete_object(Bucket=bucket_name, Key=obj['Key'])
 
 # Server class 
 class Server:
@@ -56,20 +72,38 @@ class Member:
         # We must call a recieveFormResponse in the Organization.
         # In that function, it will be appended to the list of responses. 
         # Then it can be clicked on, at which point the generatePDf(from response) will occur.
-
+        
         # mark complete 
         self.currentForm.complete = True
         org = self.currentForm.org
         fields = self.currentForm.fields
+
+        # STORE THE GIVEN NAME SO WE CAN RETURN IT TO THE WEBSITE
+        name = PdfGenerator.getNameByFields(fields)
+        self.firstName = name[0]
+        self.lastName = name[1]
+        name = name[0] + ' ' + name[1]
+
         formID = self.currentForm.formID
         # We need the responder's ID.. or can we just pass the responder object themself?
         # I will try to pass responder but I'm wondering how passing objects over the network will be
         # as opposed to passing the ID and then finding the object at the other end.
 
-        now = current_dateTime = datetime.now()
+        now = datetime.now()
+        # if > 12 subtract 12 and set pm
+        if now.hour > 12:
+            hour = now.hour - 12
+            suffix = "PM"
+        else:
+            hour = now.hour
+            suffix = "AM"
 
+        if len(str(now.minute)) == 1:
+            minute = '0'+ str(now.minute)
+        else:
+            minute = now.minute
         
-        response = pdfResponse(self, str(now.month) +" / "+str(now.day)+" / "+str(now.year), fields, formID, org)
+        response = pdfResponse(self, str(now.month) +"/"+str(now.day)+"/"+str(now.year)+" @ "+str(hour)+":"+str(minute)+' '+suffix, fields, formID, org, name)
         org.receiveFormResponse(response)
 
 
@@ -155,6 +189,37 @@ class Organization:
         self.members = []
         self.currentForm = None
 
+    def uploadS3(path, old_key):
+        # delete old link, if exists
+        if old_key:
+            s3.delete_object(Bucket=bucket_name, Key=old_key)
+
+
+        # upload new file
+        image_key = str(datetime.now())
+
+        for char in [' ', ':', '.', '-']:
+            image_key = image_key.replace(char, "")
+
+        image_key += os.path.splitext(path)[1]
+        with open(path, 'rb') as f:
+            s3.upload_fileobj(f, bucket_name, image_key)
+        
+        url = s3.generate_presigned_url(
+        ClientMethod='get_object',
+        Params={
+            'Bucket': bucket_name,
+            'Key': image_key
+        },
+        ExpiresIn=None
+    )
+
+        return url
+            
+        # return new link
+        
+
+
     # NOTE: This should probably add a Member object. at a minimum, it needs to take more info
     # so that we can properly manage and reference the member
     def addMember(self, member):
@@ -182,10 +247,15 @@ class Organization:
     # Organization wants to create a new form using the button. 
     # It must be given a new formID, the number of created forms.
     # returns the form object
-    def generateNewForm(self, path, title, due):
+    def generateNewForm(self, path, title, desc, due):
 
         formID = len(self.forms)
-        newForm = PdfGenerator.generateForm(path, title, formID, due, self)
+        newForm = PdfGenerator.generateForm(path, title, desc, formID, due, self)
+
+        # Create, upload and store the path of the printable in s3
+        printablePath = PdfGenerator.printForm(newForm)
+        newForm.printable = Organization.uploadS3(printablePath, "")
+
         self.forms.append(newForm)
         self.currentForm = newForm
         return newForm
@@ -203,7 +273,7 @@ class Organization:
                 newField = pdfElement(field.name, field.type, field.value, field.index, field.rect, field.generated, field.pageHeight, field.pageWidth, field.pageIndex)
                 fields.append(newField)
 
-            newReq = pdfRequest(form.name, form.due, self, fields, form.formID)
+            newReq = pdfRequest(form.name, form.due, self, fields, form.formID, form.printable)
             targets.receiveFormRequest(newReq)
             return
 
@@ -214,19 +284,29 @@ class Organization:
                 newField = pdfElement(field.name, field.type, field.value, field.index, field.rect, field.generated, field.pageHeight, field.pageWidth, field.pageIndex)
                 fields.append(newField)
                 
-            newReq = pdfRequest(form.name, form.due, self, fields, form.formID)
+            newReq = pdfRequest(form.name, form.due, self, fields, form.formID, form.printable)
             target.receiveFormRequest(newReq)
 
     # We have recieved a member's response! Append it and refresh our view list.
     # We must store this updated list to save the responses on the server
     def receiveFormResponse(self, response):
+
+        # STORE THE s3 BUCKET LINK HERE
+        response.pdf = self.saveResponseAsPdf(response)
+
+        
+
         self.responses.append(response) # Cool, but we want to rather store this in the form's response list, not orgs
         id = response.formID
         form = self.forms[id]
         form.responses.append(response)
 
+        # UPDATE THE s3 EXCEL SHEET AND STORE IT
+        excelPath = PdfGenerator.generateExcel(form)
+        form.excel = Organization.uploadS3(excelPath, form.excel)
+
         # TODO: Here we will refresh the UI on desktop to show the new response, and store the new result (database?)
-        self.saveResponseAsPdf(response) # Creates a pdf with the responses and saves it to pc
+         # Creates a pdf with the responses and saves it to pc
         # TODO: Send email to organization that member has submitted!
         # TODO: Send confirmation email to member that their response was recieved
 
@@ -235,6 +315,7 @@ class Organization:
     # Store the response as a pdf
     # enters the necessary directory, or creates it
     # then, calls generatePdf which implicitly then populates the pdf with our responses
+    #TODO upload to s3 here and return the link
 
     def saveResponseAsPdf(self, response):
 
@@ -254,12 +335,17 @@ class Organization:
 
         path = "responses/"+formName+"/"
 
-        PdfGenerator.generatePdf(response, path)
+        pdf = PdfGenerator.generatePdf(response, path)
+        # TODO upload to s3 here. Then, return the s3 link.
+        return Organization.uploadS3(pdf, "") # pass the new file and the old version which we will unlink.
 
 
     # I uploaded a form on behalf of members. 
     # Turn each pdf into a form object
     # We have a reference to the current form, where we can gather most fields.
+    # NOTE: This function has to rely on databse info so im not sure it can be autonomous.
+    # Can we access db through the lambda? I need to iterate over every form the organization has to see if there's
+    # a response for this form, also need to iterate over members to see if their na
 
     def addExisitngResponses(self):
         # For each form look for a folder of its name
@@ -363,7 +449,9 @@ class Organization:
                         m_ti = time.ctime(ti_m)
 
                         # Create and add the complete response to the array of responses
-                        response = pdfResponse(member, m_ti, complete.fields, self.currentForm.formID, self.currentForm.org)
+                        # This is like how in the DB responses will be added and associated with the form, the member who responded
+                        # and all other details
+                        response = pdfResponse(member, m_ti, complete.fields, self.currentForm.formID, self.currentForm.org, member.firstName+' '+member.lastName)
                         self.currentForm.responses.append(response) 
 
                         # Add the form file to folder of complete PDF documents
