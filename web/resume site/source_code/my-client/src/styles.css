@@ -1,0 +1,274 @@
+#profile-card
+{
+	width:300px;
+	display:inline-block;
+}
+
+
+#test {
+display:inline-block;
+}
+
+#headshot{
+width: 60px;
+height: 60px;
+border-radius: 30%;
+
+}
+
+
+#image
+{
+	display:inline-block;
+	
+}
+
+#mydetails
+{
+display:inline-block;
+padding:30px;
+}
+
+#myname
+{
+font-size: 25px;
+display:inline-block;
+padding-left:15px;
+}
+#mysubname
+{
+font-size: 15px;
+display:inline-block;
+padding-left:15px;
+}
+
+#entry
+{
+width:400px;
+}
+
+#numberlabel
+{
+	padding: 10px;
+	text-align: center;
+	vertical-align: bottom ;
+}
+
+
+
+
+
+
+
+#new1 {
+
+	display:inline-block;
+
+}
+
+#new-item, #refresh {
+	padding-left:10px;
+
+	display:inline-block;
+	
+	transform: translateY(-5%);
+
+}
+
+
+
+#card-border{
+	padding-left: 15px;
+	padding-top: 15px;
+	padding-right: 15px;
+	display:inline-block;
+	overflow-y:auto;
+}
+
+#content
+{
+	overflow-y:auto;
+	height:600px
+	
+}
+
+#content-border
+{
+	overflow-y:auto;
+	width: 100%;
+	
+	padding:10px;
+	
+	
+}
+
+#qty {
+	width:100%;
+}
+
+#item-qty {
+	float: right;
+}
+
+.card-text {
+	display:inline-block
+}
+
+#form-entry {
+	display:inline-block;
+	position: absolute;
+	top:100px;
+}
+
+#desc {
+	padding-left:160px;
+	display:inline-block;
+}
+
+#details {
+	height:294px;
+}
+
+#desc-label {
+	display:block;
+}
+
+
+#left-entry {
+	display:inline-block;
+	vertical-align: top ;
+}
+
+#currentItem {
+	display:inline-block
+}
+
+
+#card {
+ max-width: 18rem;
+ transition: transform .2s;
+
+}
+
+#card:hover {
+	
+	transform: scale(1.05);
+	cursor:pointer;
+}
+
+
+#card-img{
+	margin:auto;
+	object-fit: cover;
+}
+
+#page-update
+{
+	display:none;
+}
+
+#curItemPreview
+{
+	transform: scale(2);
+}
+
+#modify-item-btns {
+	width:100%;
+	padding-top: 95px;
+	display:inline-block;
+}
+
+#delete-item
+{
+	float:left;
+}
+
+#confirm-item
+{
+	float:right;
+}
+
+.dropdown
+{
+	display:inline-block;
+	padding-left: 20px;
+}
+
+
+#left-nav
+{
+	float:left;
+}
+
+#imgInput, #nameInput, #qtyInput {
+	max-width:300px;
+}
+
+#card-name {
+	max-width: 235px;
+}
+
+#login {
+	border-radius: 25px;
+  	border: 2px solid #9c9c9c;
+  	padding: 20px;
+	width:fit-content;
+	height: 350px;
+	position: relative;
+	
+}
+
+#login-wrap
+{
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#login-btn-div
+{
+	padding-top:20px;
+	position: absolute;
+    bottom: 0;
+	padding-bottom:10px;
+}
+
+#login-btn
+{
+	width: 100px;
+}
+
+#toggle-authmode-btn
+{ background:none; border:none; }
+
+#toggle-authmode
+{
+	padding-left: 10px;
+	display:inline;
+}
+
+#errorMsg
+{
+	color: lightcoral;
+    flex-direction: column;
+    align-items: center;
+	display:none
+}
+#authModeHeader
+{
+	color:lightsteelblue
+}
+
+#usernameDisplay
+{
+	display:inline-block;
+	padding-left:15px;
+	padding-right:15px;
+}
+
+#eye
+{
+	padding-left:5px;
+	transform: translateY(-10%);
+
+}
