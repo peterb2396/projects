@@ -1,0 +1,334 @@
+#content
+{
+	background-color: rgb(195, 211, 221);
+}
+
+#items
+{
+	overflow-y: auto;
+	overflow-x:hidden;
+	flex-direction: column;
+	display: flex;
+	justify-content: space-between;
+	max-height:500px;
+}
+#item-container 
+{
+	position: absolute;
+	display:inline-block;
+	padding-top:10px;
+	width:1300px;
+	
+	
+	/* Ensure the below two items, item and detail-header have the same width! */
+}
+#item {
+	transition: transform .2s;
+	border-radius: 10px;
+	border: 1px solid #0D6EFD;
+	background-color: #fefefe;
+	margin:5px;
+	width: 1200px;
+	height: 40px;
+	flex-shrink: 0;
+  }
+
+  #detail-header
+{
+	width:100%;
+	display:flex;
+	justify-content: space-between;
+	height:100%;
+	align-items:center;
+	margin:5px;
+	width: 1200px;
+	height: 40px;
+	flex-shrink: 0;
+}
+
+
+#item-detail-hbox
+{
+	width:100%;
+	display:flex;
+	justify-content: space-between;
+	height:100%;
+	align-items:center;
+
+}
+
+#item-detail
+{
+	width:100%;
+	padding: 5px;
+}
+
+
+
+#item:hover {
+	
+	transform: scale(1.01);
+	cursor:pointer;
+	background-color: #ececec;
+}
+
+
+#new1 {
+
+	display:inline-block;
+
+}
+
+#log-filter {
+
+	display:inline-block;
+	transform: translateY(5%);
+	padding-left:10px;
+
+}
+
+#new-item, #refresh {
+	padding-left:10px;
+
+	display:inline-block;
+	
+	transform: translateY(-5%);
+
+}
+
+#content-border
+{
+	overflow-y:auto;
+
+	padding:10px;
+	
+	
+}
+#qty {
+	width:100%;
+
+}
+
+#item-qty {
+	float: right;
+}
+
+.card-text {
+	display:inline-block
+}
+
+#form-entry {
+	display:inline-block;
+	position: absolute;
+	top:100px;
+}
+
+#desc {
+	padding-left:60px;
+	display:inline-block;
+}
+
+#details {
+	height:200px;
+}
+
+#desc-label {
+	display:block;
+}
+
+
+#left-entry {
+	display:inline-block;
+	vertical-align: top ;
+}
+
+#currentItem {
+	display:inline-block;
+
+}
+
+
+#card {
+ width:18rem;
+ height:500px;
+
+}
+
+#content
+{
+	overflow-y:auto;
+	height: 85vh
+	
+}
+
+#card-border{
+	padding-left: 15px;
+	padding-top: 15px;
+	padding-right: 15px;
+	display:inline-block;
+	overflow-y:auto;
+}
+
+#img-file-browser
+{
+	padding-bottom: 20px;
+}
+
+
+#card-img{
+	margin:auto;
+	object-fit: cover;
+	display: flex;
+  	justify-content: center;
+}
+
+#item-option
+{
+	width:100%;
+	margin: 5px;
+
+}
+#item-options
+{
+	padding-top:20px;
+	flex-direction: column;
+	display: flex;
+	justify-content: space-between;
+	
+}
+#back-to-item, #seller-details, #page-update, #more-details, #cashout-details, #cashout-confirm
+{
+	display:none;
+}
+
+
+
+
+#modify-item-btns {
+	width:100%;
+	padding-top: 95px;
+	display:inline-block;
+}
+
+#item-btns {
+	padding: 5px;
+	
+}
+
+#item-buttons {
+	padding-top: 10px;
+}
+
+#delete-item
+{
+	float:left;
+}
+
+#confirm-item
+{
+	float:right;
+}
+
+
+
+#adjacent
+{
+	display:flex;
+	flex-direction:row
+}
+
+#cashout-item, #cashout-confirm
+{
+	float:right;
+	color: blue;
+}
+
+#print-barcode
+{
+	float:left;
+	color: blue;
+}
+
+#prompt
+{
+	font-size: 20px;
+	padding-top:50px;
+	padding-left:30px;
+	
+}
+.dropdown
+{
+	display:inline-block;
+	padding-left: 20px;
+}
+
+#left-nav
+{
+	float:left;
+}
+
+#group-listing
+{
+	width:fit-content;
+}
+
+hr.solid {
+	border-top: 3px solid #bbb;
+}
+
+button.link {
+	background: none!important;
+	border: none;
+	padding: 0!important;
+	/*optional*/
+	font-family: arial, sans-serif;
+	/*input has OS specific font-family*/
+	color: #069;
+	text-decoration: underline;
+	cursor: pointer;
+  }
+
+
+  /* The Modal (background) */
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	padding-top: 100px; /* Location of the box */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgb(0,0,0); /* Fallback color */
+	background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 40%;
+  }
+  
+  /* The Close Button */
+  .close {
+	color: #aaaaaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+  }
+
+#modal-button
+{
+	padding-top:5px;
+}
