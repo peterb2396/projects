@@ -1,0 +1,132 @@
+.main-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+.left-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 100vh;
+  background-color: #BEA4D0;
+  color: #ffffff;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  transition: all 0.5s ease-in-out;
+}
+
+.right-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  width: 50%;
+  padding-top: 50px;
+  transition: all 0.5s ease-in-out;
+}
+
+.response-list {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  padding-top: 50px;
+  width: 100%;
+  animation-name: slide-in;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  border: 1px solid #ffffff;
+ 
+
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
+
+.move-left {
+  transform: translateX(-100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: #F7F7F8;
+}
+
+
+.hide-left {
+  transform: translateX(-100%);
+}
+
+.right-head {
+  font-size: 25px;
+  font-weight: 600;
+  margin-bottom: 50px;
+}
+
+.view-excel-button {
+  margin-bottom: 50px;
+  background-color: #BEA4D0;
+  border-radius: 25px;
+  margin-right: 25px;
+}
+.print-form-button {
+  margin-bottom: 50px;
+  background-color: #BEA4D0;
+  border-radius: 25px;
+  margin-right: 15px;
+}
+
+.download-excel-button {
+  background-color: #BEA4D0;
+  border-radius: 25px;
+  margin-top: 20px;
+}
+
+.view-excel-button:hover,
+.download-excel-button:hover {
+  opacity: 0.8;
+  background-color: #BEA4D0;
+}
+
+.right-modal {
+  background-color: #EEEFF3;
+  width: 40%;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 350px;
+  /* align-self: flex-start;
+  margin-left: 30px; */
+}
+
+.active-form {
+  border-left: 5px solid #BEA4D0;
+
+}
+
+.right-modal:hover {
+  background-color: #BEA4D0;
+  color: #ffffff;
+}
+
+.left-welcome {
+  font-size: 30px;
+}
+.left-body {
+  font-size: 20px;
+  margin-top: 20px;
+}
+
+.hide-list {
+  visibility: hidden;
+}

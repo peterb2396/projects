@@ -1,0 +1,11 @@
+#lang scheme
+(define (subst x y expr)
+    (if
+        (null? expr)
+        (if (eq? x expr) y expr)
+        (cons (subst x y (car expr))
+            (subst x y (cdr expr))
+            )
+        )
+    )
+(subst '(a) '(b) '(b a b))

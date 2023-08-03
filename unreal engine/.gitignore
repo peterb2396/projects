@@ -1,0 +1,9 @@
+/*
+!.gitignore
+!README.md
+
+!SimpleCalculator/
+SimpleCalculator/*
+!SimpleCalculator/SimpleCalc/
+SimpleCalculator/SimpleCalc/*
+!SimpleCalculator/SimpleCalc/Content/

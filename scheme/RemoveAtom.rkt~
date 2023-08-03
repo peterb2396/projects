@@ -1,0 +1,7 @@
+#lang scheme
+(define (deleteItem item list) 
+  (cond 
+    ((empty? list) '())
+    ((equal? item (car list)) (cdr list))
+    (else (cons (car list) (deleteItem item (cdr list))))))
+(deleteItem (list 2) (list 1 2 3 4))
