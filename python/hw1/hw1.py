@@ -2,6 +2,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import os
+from sklearn.decomposition import PCA as pc2
 
 debug = False
 input_path = 'hw1/input'
@@ -107,57 +108,61 @@ def find_r(Y, a):
     # Break when we find so that we dont waste memory
     for r in range(1, d):
 
+        retention = calculate_retention(Y, r)
+
         # Success if this ratio is >= a (executes at most once)
-        if (calculate_retention(Y, r) >= a):
+        if (retention >= a):
             
             # Determine the number of principal components (PCs) r that will ensure 100a% retained variance
             print("There are %d PCs that maintain at least %.5f ratio of variance" % (d - r + 1, a))
 
-            return r
+            return r, retention
         
     # PCA Fails
-    return -1
+    return -1, None
 
-
-
-# PCA Function for this data and alpha value
-# Finds optimal dimension to reduce to
-# Minimizes mean squared error, maximizes variance
-# Requires maintaining a ratio of a variance from original data
-def PCA(D, a):
-    # Proceed if successful load of file, otherwise try the next input (or finish)
-    if D.any():
-        # center the data as a new matrix, Z
-        Z = center(D)
-        E = cov_2(Z)
-        Y = np.linalg.eigvals(E) # Eigen values = Y
-
-        # Find optimal r for this alpha value
-        r = find_r(Y, a)
-
-        if (r == -1):
-            # Not possible to reduce dimension based on alpha
-            return np.empty([1,1])
-
-        # Reduce to r dimensions
-        return reduce(D, r)
-        
                 
             
 # Reduce the given data to a specified number of dimensions.
-# PCA will find this r for us, or we can skip straight here and choose r
+# If r >=1, reduce to exactly r dimensions
+# If r < 1, execute PCA to find optimal dimension that retains r variance ratio
+    # NOTE To attempt to retain 100% variance, pass 0. Passing 1 will attempt to reduce to 1 dimension.
 def reduce(D, r):
     # Proceed if successful load of file, otherwise try the next input (or finish)
     if D.any():
+
         # center the data as a new matrix, Z
         Z = center(D)
         E = cov_2(Z)
         Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
 
-        retention = calculate_retention(Y, r)
+        retention = 0
 
-        # Retention statistic display
-        print("Reducing to %d %s maintains accuracy ratio of %.5f" % (r, ("dimensions" if r > 1 else "dimension"),retention))
+        # Check if we must compute r:
+        if (r < 1):
+            # Find optimal dimension for this alpha value
+            r, retention = find_r(Y, r)
+
+            if (r == -1):
+                # Not possible to reduce dimension based on alpha
+                return np.empty([1,1])
+        
+        # We passed 0, try to retain 100% variance
+        elif (r == 0):
+            # Find optimal dimension for this alpha value
+            r, retention = find_r(Y, 1)
+
+            if (r == -1):
+                # Not possible to reduce dimension based on alpha
+                return np.empty([1,1])
+            
+        # We provided a dimension to (attempt to) reduce to, find retention
+        else:
+            retention = calculate_retention(Y, r)
+            
+
+
+        # NOTE * We now have the r-value (optimal dimension) and can reduce.
 
         n, d = D.shape # dimensions of the data
 
@@ -173,7 +178,7 @@ def reduce(D, r):
             A[i, :] = np.dot(U_r.T, d).T # result must be 1xr. 
         
         # return the reduced dimensionality array!
-        return A, retention
+        return A, U_r, retention
                 
 # Calculate the ratio of variance preserved when reducing to r dimensions
 def calculate_retention(Y, r):
@@ -196,20 +201,53 @@ def calculate_retention(Y, r):
     # Calculate realized variance
     return( proj_var / og_var )
 
-# Plot a 2D matrix
-def plot(A, title, label):
-    if (A.shape[1] != 2):
-        print('Cannot plot A because it is not 2 dimensional! (it has %d dimensions)' % A.shape[1])
-        return
+# Plot a 2D matrix, magnitude of each principal component on each dimension
+# Save components to file
+def plot(A, title, retention, U_r, dimensions):
+    markers = ['o', 's', 'D', 'v', '^', '<', '>', '1', '2', '3', '4', '8', 's', 'p', '*', 'h', 'H', '+', 'x', '|', '_']
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
-    plt.scatter(A[:, 0], A[:, 1], marker='o', color='blue', label= title)
+    if (A.shape[1] > 2):
+        print('Couldnt plot reduced matrix because it has %d dimensions' % A.shape[1])
+    
+    # We can plot the new matrix!
+    else:
+        plt.scatter(A[:, 0], A[:, 1] if A.shape[1] == 2 else np.zeros(A.shape[0]), marker='o', color='blue', label= title)
 
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title('2D Retained Variance: %.6f' % label)
+
+        plt.xlabel('Component 1')
+        plt.ylabel('Component 2' if A.shape[1] ==2 else None)
+        plt.title('%dD Retained Variance: %.6f' % (A.shape[1], retention))
+        plt.legend()
+
+        plt.show()
+
+
+    # Plot the diagnostics, regardless of dimension
+    with open('U_r.txt', 'w') as file:
+        for c in range(U_r.shape[1]):
+            marker = markers[c % len(markers)]
+            color = colors[c % len(colors)]
+
+            x = [d for d in range (dimensions)] # List of d integers (the dimensions)
+            y = [1 - abs(U_r[d, c]) for d in x] # List of y values for this dimension
+            label = 'PC%d' % (c + 1)
+
+            plt.plot(x, y, linestyle='--', marker=marker, color=color, label= label)
+            file.write(','.join(map(str, U_r[:, c])) + '\n')
+
+        file.close()
+    
+
+
+    plt.xlabel('Dimension')
+    plt.ylabel('Strength')
+    plt.title('Dimensional Correlation')
     plt.legend()
 
     plt.show()
+
+
 
 
 if __name__ == '__main__':
@@ -221,12 +259,20 @@ if __name__ == '__main__':
 
         # Load each dataset in the folder
         data = load_data(file_path)
-        #A, retention = PCA(data, 0.999)
-        A, retention = reduce(data, 2)
+
+        #pca = pc2(n_components=2)
+        #principal_components = pca.fit_transform(data)
+        #print(np.linalg.norm(principal_components[:, 0]))
+        #print(principal_components)
+
+        # Use .98 and .988 to display graph
+        A, components, retention = reduce(data, 0.999)
 
         if(A.any()):
-            #print(A)
-            plot(A, file, retention)
+            print("Reduced to %d %s, maintaining accuracy ratio of %.5f" % (components.shape[1], ("dimensions" if components.shape[1] > 1 else "dimension"),retention))
+            plot(A, file, retention, components, data.shape[1])
+            
+            pass
         else:
             # Failed to find reduced mtx
             print("Not possible to reduce dimensions")
