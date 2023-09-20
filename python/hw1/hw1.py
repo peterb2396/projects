@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import matplotlib.pyplot as plt
 
 debug = False
 
@@ -118,6 +119,9 @@ def find_r(Y, a):
 
 
 # PCA Function for this data and alpha value
+# Finds optimal dimension to reduce to
+# Minimizes mean squared error, maximizes variance
+# Requires maintaining a ratio of a variance from original data
 def PCA(D, a):
     # Proceed if successful load of file, otherwise try the next input (or finish)
     if D.any():
@@ -139,7 +143,7 @@ def PCA(D, a):
                 
             
 # Reduce the given data to a specified number of dimensions.
-# PCA will find this r for us, or (for homework) we can skip straight here and choose r
+# PCA will find this r for us, or we can skip straight here and choose r
 def reduce(D, r):
     # Proceed if successful load of file, otherwise try the next input (or finish)
     if D.any():
@@ -167,6 +171,7 @@ def reduce(D, r):
         # return the reduced dimensionality array!
         return A
                 
+# Calculate the ratio of variance preserved when reducing to r dimensions
 def calculate_retention(Y, r):
     # Original dimension, d:
     d = Y.shape[0]
@@ -187,7 +192,20 @@ def calculate_retention(Y, r):
     # Calculate realized variance
     return( proj_var / og_var )
 
+# Plot a 2D matrix
+def plot(A):
+    if (A.shape[1] != 2):
+        print('Cannot plot A because it is not 2 dimensional! (it has %d dimensions)' % A.shape[1])
+        return
 
+    plt.scatter(A[:, 0], A[:, 1], marker='o', color='blue', label='r = 2')
+
+    plt.xlabel('X-axis')
+    plt.ylabel('Y-axis')
+    plt.title('Reduction to 2D')
+    plt.legend()
+
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -196,10 +214,12 @@ if __name__ == '__main__':
     # For each dataset, process the following
     for input in inputs:
         data = load_data(input)
-        A = PCA(data, 0.999)
+        #A = PCA(data, 0.999)
+        A = reduce(data, 2)
 
         if(A.any()):
             print(A)
+            plot(A)
         else:
             # Failed to find reduced mtx
             print("Not possible to reduce dimensions")
