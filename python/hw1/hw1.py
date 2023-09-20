@@ -154,8 +154,10 @@ def reduce(D, r):
         E = cov_2(Z)
         Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
 
+        retention = calculate_retention(Y, r)
+
         # Retention statistic display
-        print("Reducing to %d %s maintains accuracy ratio of %.5f" % (r, ("dimensions" if r > 1 else "dimension"),calculate_retention(Y, r)))
+        print("Reducing to %d %s maintains accuracy ratio of %.5f" % (r, ("dimensions" if r > 1 else "dimension"),retention))
 
         n, d = D.shape # dimensions of the data
 
@@ -171,7 +173,7 @@ def reduce(D, r):
             A[i, :] = np.dot(U_r.T, d).T # result must be 1xr. 
         
         # return the reduced dimensionality array!
-        return A
+        return A, retention
                 
 # Calculate the ratio of variance preserved when reducing to r dimensions
 def calculate_retention(Y, r):
@@ -195,16 +197,16 @@ def calculate_retention(Y, r):
     return( proj_var / og_var )
 
 # Plot a 2D matrix
-def plot(A):
+def plot(A, title, label):
     if (A.shape[1] != 2):
         print('Cannot plot A because it is not 2 dimensional! (it has %d dimensions)' % A.shape[1])
         return
 
-    plt.scatter(A[:, 0], A[:, 1], marker='o', color='blue', label='r = 2')
+    plt.scatter(A[:, 0], A[:, 1], marker='o', color='blue', label= title)
 
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
-    plt.title('Reduction to 2D')
+    plt.title('2D Retained Variance: %.6f' % label)
     plt.legend()
 
     plt.show()
@@ -218,12 +220,12 @@ if __name__ == '__main__':
 
         # Load each dataset in the folder
         data = load_data(file_path)
-        #A = PCA(data, 0.999)
-        A = reduce(data, 2)
+        #A, retention = PCA(data, 0.999)
+        A, retention = reduce(data, 2)
 
         if(A.any()):
             print(A)
-            plot(A)
+            plot(A, file, retention)
         else:
             # Failed to find reduced mtx
             print("Not possible to reduce dimensions")
