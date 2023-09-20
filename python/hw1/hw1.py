@@ -25,13 +25,14 @@ def mean(data):
     return sum/len(data)
 
 # Center the data by subtracting the mean from each data point
-def center(data):
-    u = mean(data)
-    for x in data:
+def center(D):
+    Z = np.copy(D)
+    u = mean(D)
+    for x in Z:
         x -= u
 
-# by using the definition of sample covariance
-def cov_1(data):
+# by using the definition of sample covariance O(d^2)
+def cov_1(data): 
     start_time = time.time()
 
     n, d = data.shape  # n = samples, d = features
@@ -52,7 +53,7 @@ def cov_1(data):
     print(f"cov_1 took {duration}ms")
     return E
 
-# as a matrix product
+# as a matrix product, O(d)
 def cov_2(data):
     start_time = time.time()
 
@@ -64,7 +65,7 @@ def cov_2(data):
     print(f"cov_2 took {duration}ms")
     return E
 
-# as sum of outer products
+# as sum of outer products, O(d^3)
 def cov_3(data):
     start_time = time.time()
     
@@ -84,8 +85,61 @@ def cov_3(data):
     print(f"cov_3 took {duration}ms")
     return E
 
+# PCA Function for this data and alpha value
+def PCA(D, a):
+    # Proceed if successful load of file, otherwise try the next input (or finish)
+        if D.any():
+            # center the data as a new matrix, Z
+            Z = center(D)
+            E = cov_2(data)
+            Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
 
+            n, d = D.shape # dimensions of the data
 
+            # Calculate the original variance to compute ratio f(r)
+            og_var = 0
+            for i in range(d): 
+                y = Y[i]
+                og_var += y
+
+            # Compute f(r) for each 0 <= r < d until f(r) >= a
+            # Break when we find so that we dont waste memory
+            for r in range(1, d):
+
+                # Sum the first r eigen values: Projected Variance
+                proj_var = 0
+                for i in range(r):
+                    y = Y[i]
+                    proj_var += y
+                
+                # Calculate realized variance
+                var_ratio = proj_var / og_var
+                print(var_ratio)
+
+                # Proceed if this ratio is >= a (executes at most once)
+                if (var_ratio >= a):
+
+                    # initialize result matrix, nxr
+                    A = np.zeros((n, r))
+                    #print(A.shape)
+                    U_r = U[:, :r] # Consider first r eigen vectors (cols)
+
+                    # for each data point (row)..
+                    for i in range(n):
+                        d = D[i].reshape(1, -1).T
+                        
+                        
+                        #print(U_r.T.shape, d.shape)
+                        # New data sample (row) is U^T * original data sample
+                        A[i, :] = np.dot(U_r.T, d) # result must be 1xr.   U_r.T should be -> r x d d x 1 <- d should be 
+                    
+                    # return the reduced dimensionality array!
+                    return A
+                
+            # Not possible to reduce dimension based on alpha
+            return np.empty([1,1])
+
+                
 
 
 
@@ -95,11 +149,13 @@ if __name__ == '__main__':
     # For each dataset, process the following
     for input in inputs:
         data = load_data(input)
+        A = PCA(data, 0.9)
 
-        # Proceed if successful load of file, otherwise try the next input (or finish)
-        if data.any():
-            #print(mean(data))
-            center(data)
-            cov_1(data)
-            cov_2(data)
-            cov_3(data)
+        if(A.any()):
+            print(A)
+        else:
+            # Failed to find reduced mtx
+            print("Not possible to reduce dimensions")
+
+        
+
