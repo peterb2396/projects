@@ -30,6 +30,8 @@ def center(D):
     u = mean(D)
     for x in Z:
         x -= u
+    
+    return Z
 
 # by using the definition of sample covariance O(d^2)
 def cov_1(data): 
@@ -85,56 +87,74 @@ def cov_3(data):
     print(f"cov_3 took {duration}ms")
     return E
 
+# Find optimal dimension, r, to reduce D to that keeps a ratio of variance
+def find_r(Y, a):
+
+    # store original dimension
+    d = Y.shape[0]
+
+    # Calculate the original variance to compute ratio f(r)
+    og_var = 0
+    for i in range(d): 
+        y = Y[i]
+        og_var += y
+    # Compute f(r) for each 1 <= r < d until f(r) >= a
+    # Break when we find so that we dont waste memory
+    for r in range(1, d):
+
+        # Sum the first r eigen values: Projected Variance
+        proj_var = 0
+        for i in range(r):
+            y = Y[i]
+            proj_var += y
+        
+        # Calculate realized variance
+        var_ratio = proj_var / og_var
+
+        # Success if this ratio is >= a (executes at most once)
+        if (var_ratio >= a):
+            return r
+        
+    # PCA Fails
+    return -1
+
+
+
 # PCA Function for this data and alpha value
 def PCA(D, a):
     # Proceed if successful load of file, otherwise try the next input (or finish)
         if D.any():
             # center the data as a new matrix, Z
             Z = center(D)
-            E = cov_2(data)
-            Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
+            E = cov_2(Z)
+            Y, U = np.linalg.eig(E) # Eigen values = _, eigen vectors = U
+
+            r = find_r(Y, a)
+
+            if (r == -1):
+                # Not possible to reduce dimension based on alpha
+                return np.empty([1,1])
+
+
+            # We can reduce to r dimensions! Proceed:
 
             n, d = D.shape # dimensions of the data
 
-            # Calculate the original variance to compute ratio f(r)
-            og_var = 0
-            for i in range(d): 
-                y = Y[i]
-                og_var += y
-            # Compute f(r) for each 1 <= r < d until f(r) >= a
-            # Break when we find so that we dont waste memory
-            for r in range(1, d):
+            # initialize result matrix, nxr
+            A = np.zeros((n, r))
+            U_r = U[:, :r] # Consider first r eigen vectors (cols)
 
-                # Sum the first r eigen values: Projected Variance
-                proj_var = 0
-                for i in range(r):
-                    y = Y[i]
-                    proj_var += y
+            # for each data point (row)..
+            for i in range(n):
+                d = D[i].reshape(1, -1).T
+        
+                # New data sample (row) is U^T (row) * original data sample (col)
+                A[i, :] = np.dot(U_r.T, d) # result must be 1xr. 
+            
+            # return the reduced dimensionality array!
+            return A
                 
-                # Calculate realized variance
-                var_ratio = proj_var / og_var
-
-                # Proceed if this ratio is >= a (executes at most once)
-                if (var_ratio >= a):
-                    print(var_ratio)
-
-                    # initialize result matrix, nxr
-                    A = np.zeros((n, r))
-                    #print(A.shape)
-                    U_r = U[:, :r] # Consider first r eigen vectors (cols)
-
-                    # for each data point (row)..
-                    for i in range(n):
-                        d = D[i].reshape(1, -1).T
-                
-                        # New data sample (row) is U^T (row) * original data sample (col)
-                        A[i, :] = np.dot(U_r.T, d) # result must be 1xr. 
-                    
-                    # return the reduced dimensionality array!
-                    return A
-                
-            # Not possible to reduce dimension based on alpha
-            return np.empty([1,1])
+            
 
                 
 
