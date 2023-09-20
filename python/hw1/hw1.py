@@ -113,6 +113,9 @@ def find_r(Y, a):
 
         # Success if this ratio is >= a (executes at most once)
         if (var_ratio >= a):
+            # Determine the number of principal components (PCs) r that will ensure 100a% retained variance
+            print("There are %d PCs that maintain at least %.5f ratio of variance" % (d - r + 1, a))
+            print("The provided matrix was reduced to %d %s with an accuracy of %.5f" % (r, ("dimensions" if r > 1 else "dimension"), var_ratio))
             return r
         
     # PCA Fails
