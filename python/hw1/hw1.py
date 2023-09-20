@@ -1,8 +1,10 @@
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+import os
 
 debug = False
+input_path = 'hw1/input'
 
 def load_data(path):
     try:
@@ -209,11 +211,13 @@ def plot(A):
 
 
 if __name__ == '__main__':
-    inputs = ['hw1/hw1Data.txt']
+    files = os.listdir(input_path)
 
-    # For each dataset, process the following
-    for input in inputs:
-        data = load_data(input)
+    for file in files:
+        file_path = os.path.join(input_path, file)
+
+        # Load each dataset in the folder
+        data = load_data(file_path)
         #A = PCA(data, 0.999)
         A = reduce(data, 2)
 
