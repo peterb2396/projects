@@ -101,10 +101,9 @@ def PCA(D, a):
             for i in range(d): 
                 y = Y[i]
                 og_var += y
-
-            # Compute f(r) for each 0 <= r < d until f(r) >= a
+            # Compute f(r) for each 1 <= r <= d until f(r) >= a
             # Break when we find so that we dont waste memory
-            for r in range(1, d):
+            for r in range(1, d + 1):
 
                 # Sum the first r eigen values: Projected Variance
                 proj_var = 0
@@ -114,10 +113,10 @@ def PCA(D, a):
                 
                 # Calculate realized variance
                 var_ratio = proj_var / og_var
-                print(var_ratio)
 
                 # Proceed if this ratio is >= a (executes at most once)
                 if (var_ratio >= a):
+                    print(var_ratio)
 
                     # initialize result matrix, nxr
                     A = np.zeros((n, r))
@@ -127,11 +126,9 @@ def PCA(D, a):
                     # for each data point (row)..
                     for i in range(n):
                         d = D[i].reshape(1, -1).T
-                        
-                        
-                        #print(U_r.T.shape, d.shape)
-                        # New data sample (row) is U^T * original data sample
-                        A[i, :] = np.dot(U_r.T, d) # result must be 1xr.   U_r.T should be -> r x d d x 1 <- d should be 
+                
+                        # New data sample (row) is U^T (row) * original data sample (col)
+                        A[i, :] = np.dot(U_r.T, d) # result must be 1xr. 
                     
                     # return the reduced dimensionality array!
                     return A
