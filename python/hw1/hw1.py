@@ -217,6 +217,7 @@ if __name__ == '__main__':
 
     for file in files:
         file_path = os.path.join(input_path, file)
+        print("\n\nANALYZING DATA FROM FILE '%s'\n----------------------------------" % file)
 
         # Load each dataset in the folder
         data = load_data(file_path)
@@ -224,7 +225,7 @@ if __name__ == '__main__':
         A, retention = reduce(data, 2)
 
         if(A.any()):
-            print(A)
+            #print(A)
             plot(A, file, retention)
         else:
             # Failed to find reduced mtx
