@@ -101,9 +101,9 @@ def PCA(D, a):
             for i in range(d): 
                 y = Y[i]
                 og_var += y
-            # Compute f(r) for each 1 <= r <= d until f(r) >= a
+            # Compute f(r) for each 1 <= r < d until f(r) >= a
             # Break when we find so that we dont waste memory
-            for r in range(1, d + 1):
+            for r in range(1, d):
 
                 # Sum the first r eigen values: Projected Variance
                 proj_var = 0
