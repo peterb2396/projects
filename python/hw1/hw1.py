@@ -34,11 +34,23 @@ def center(data):
 def cov_1(data):
     start_time = time.time()
 
-    cov_matrix_1 = np.cov(data, rowvar=False, bias=True)
+    n, d = data.shape  # n = samples, d = features
+    E = np.zeros((d, d))  # Initialize the covariance matrix with zeros
+    
+    for i in range(d):
+        for j in range(i, d):
+            # Calculate covariance between i and j
+            cov_ij = np.sum(data[:, i] * data[:, j]) / (n)
+            
+            # E is symettric, set both values
+            E[i, j] = cov_ij
+            E[j, i] = cov_ij
+
 
     finish_time = time.time()
-    duration = (finish_time - start_time) * 1000  # Convert to milliseconds
-    return cov_matrix_1, duration
+    duration = (finish_time - start_time) * 1000  # MS
+    print(f"cov_1 took {duration}ms")
+    return E
 
 # as a matrix product
 def cov_2(data):
@@ -49,7 +61,7 @@ def cov_2(data):
 
     finish_time = time.time()
     duration = (finish_time - start_time) * 1000 
-    
+    print(f"cov_2 took {duration}ms")
     return E
 
 # as sum of outer products
@@ -69,6 +81,7 @@ def cov_3(data):
 
     finish_time = time.time()
     duration = (finish_time - start_time) * 1000
+    print(f"cov_3 took {duration}ms")
     return E
 
 
@@ -87,6 +100,6 @@ if __name__ == '__main__':
         if data.any():
             #print(mean(data))
             center(data)
-            cov = cov_3(data)
-            print(cov)
-            #print(cov.shape)
+            cov_1(data)
+            cov_2(data)
+            cov_3(data)
