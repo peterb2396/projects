@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 debug = False
-input_path = 'hw1/input'
+source = 'pca'
+input_path = source+'/input'
 
 def load_data(path):
     try:
@@ -219,7 +220,7 @@ def plot(A, title, retention, U_r, dimensions):
 
 
     # Plot the diagnostics, regardless of dimension
-    with open('./hw1/Components.txt', 'w') as file:
+    with open('./'+source+'/Components.txt', 'w') as file:
         for c in range(U_r.shape[1]):
             marker = markers[c % len(markers)]
             color = colors[c % len(colors)]
@@ -255,8 +256,7 @@ if __name__ == '__main__':
         # Load each dataset in the folder
         data = load_data(file_path)
 
-        # Use .98 and .988 to display graph
-        A, components, retention = reduce(data, 2)
+        A, components, retention = reduce(data, .9)
 
         if(A.any()):
             print("Reduced to %d %s, maintaining accuracy ratio of %.5f" % (components.shape[1], ("dimensions" if components.shape[1] > 1 else "dimension"),retention))
