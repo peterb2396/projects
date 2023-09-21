@@ -2,7 +2,6 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import os
-from sklearn.decomposition import PCA as pc2
 
 debug = False
 input_path = 'hw1/input'
@@ -112,10 +111,6 @@ def find_r(Y, a):
 
         # Success if this ratio is >= a (executes at most once)
         if (retention >= a):
-            
-            # Determine the number of principal components (PCs) r that will ensure 100a% retained variance
-            print("There are %d PCs that maintain at least %.5f ratio of variance" % (d - r + 1, a))
-
             return r, retention
         
     # PCA Fails
@@ -145,16 +140,16 @@ def reduce(D, r):
 
             if (r == -1):
                 # Not possible to reduce dimension based on alpha
-                return np.empty([1,1])
+                return np.empty([1,1]), -1, -1
         
         # We passed 0, try to retain 100% variance
-        elif (r == 0):
+        elif (r == 1):
             # Find optimal dimension for this alpha value
             r, retention = find_r(Y, 1)
 
             if (r == -1):
                 # Not possible to reduce dimension based on alpha
-                return np.empty([1,1])
+                return np.empty([1,1]), -1, -1
             
         # We provided a dimension to (attempt to) reduce to, find retention
         else:
@@ -212,7 +207,7 @@ def plot(A, title, retention, U_r, dimensions):
     
     # We can plot the new matrix!
     else:
-        plt.scatter(A[:, 0], A[:, 1] if A.shape[1] == 2 else np.zeros(A.shape[0]), marker='o', color='blue', label= title)
+        plt.scatter(A[:, 0], A[:, 1] if A.shape[1] == 2 else np.zeros(A.shape[0]), marker='o', color='blue', label= title, s=2)
 
 
         plt.xlabel('Component 1')
@@ -224,13 +219,13 @@ def plot(A, title, retention, U_r, dimensions):
 
 
     # Plot the diagnostics, regardless of dimension
-    with open('U_r.txt', 'w') as file:
+    with open('./hw1/Components.txt', 'w') as file:
         for c in range(U_r.shape[1]):
             marker = markers[c % len(markers)]
             color = colors[c % len(colors)]
 
             x = [d for d in range (dimensions)] # List of d integers (the dimensions)
-            y = [1 - abs(U_r[d, c]) for d in x] # List of y values for this dimension
+            y = [U_r[d, c] for d in x] # List of y values for this dimension
             label = 'PC%d' % (c + 1)
 
             plt.plot(x, y, linestyle='--', marker=marker, color=color, label= label)
@@ -260,13 +255,8 @@ if __name__ == '__main__':
         # Load each dataset in the folder
         data = load_data(file_path)
 
-        #pca = pc2(n_components=2)
-        #principal_components = pca.fit_transform(data)
-        #print(np.linalg.norm(principal_components[:, 0]))
-        #print(principal_components)
-
         # Use .98 and .988 to display graph
-        A, components, retention = reduce(data, 0.999)
+        A, components, retention = reduce(data, 2)
 
         if(A.any()):
             print("Reduced to %d %s, maintaining accuracy ratio of %.5f" % (components.shape[1], ("dimensions" if components.shape[1] > 1 else "dimension"),retention))
@@ -275,7 +265,4 @@ if __name__ == '__main__':
             pass
         else:
             # Failed to find reduced mtx
-            print("Not possible to reduce dimensions")
-
-        
-
+            print("Not possible to perform reduction")
