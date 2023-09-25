@@ -2,10 +2,12 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import os
+import tkinter as tk
+from tkinter import simpledialog
 
 debug = False
-source = 'pca'
-input_path = source+'/input'
+source = ''
+input_path = source+'input'
 
 def load_data(path):
     try:
@@ -133,9 +135,7 @@ def reduce(D, r):
         Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
 
         retention = 0
-
-        # Check if we must compute r:
-        if (r < 1):
+        if (r is not 0 and r < 1):
             # Find optimal dimension for this alpha value
             r, retention = find_r(Y, r)
 
@@ -144,7 +144,7 @@ def reduce(D, r):
                 return np.empty([1,1]), -1, -1
         
         # We passed 0, try to retain 100% variance
-        elif (r == 1):
+        elif (r == 0):
             # Find optimal dimension for this alpha value
             r, retention = find_r(Y, 1)
 
@@ -237,14 +237,36 @@ def plot(A, title, retention, U_r, dimensions):
 
 
     plt.xlabel('Dimension')
-    plt.ylabel('Strength')
-    plt.title('Dimensional Correlation')
+    plt.ylabel('Variance')
+    plt.title('Projection Accuracy (%.2f)' % (retention * 100))
     plt.legend()
 
     plt.show()
 
+# Execute and test PCA
+def PCA(D, x):
+    A, components, retention = reduce(D, x)
+
+    if(A.any()):
+        print("Reduced to %d %s, maintaining accuracy ratio of %.5f" % (components.shape[1], ("dimensions" if components.shape[1] > 1 else "dimension"),retention))
+        plot(A, file, retention, components, data.shape[1])
+        try:
+            root.destroy()
+        except:
+            return
 
 
+    else:
+        # Failed to find reduced mtx
+        print("Not possible to perform reduction")
+        root = tk.Tk()
+        root.title("Error")
+
+        message_label = tk.Label(root, text="", font=("Arial", 14))
+        message_label.pack(pady=20) 
+        message_label.config(text="Dataset could not be reduced\nwith the given criteria.")
+
+        root.mainloop()
 
 if __name__ == '__main__':
     files = os.listdir(input_path)
@@ -256,13 +278,50 @@ if __name__ == '__main__':
         # Load each dataset in the folder
         data = load_data(file_path)
 
-        A, components, retention = reduce(data, .9)
+    
+        # Function to handle the button clicks
+        def button_click(option):
+            if option == "Retained Variance":
+                while True:
+                    value = simpledialog.askfloat("Test123", f"Enter a value between 0 and 1 pertaining to the ratio of variance required to be retained.\nYou will be presented with the lowest dimensional representation of the dataset that maintains at least this variance:")
+                    if not (value > 1 or value < 0):
+                        break
+                if value == 1.0:
+                    value = 0
 
-        if(A.any()):
-            print("Reduced to %d %s, maintaining accuracy ratio of %.5f" % (components.shape[1], ("dimensions" if components.shape[1] > 1 else "dimension"),retention))
-            plot(A, file, retention, components, data.shape[1])
-            
-            pass
-        else:
-            # Failed to find reduced mtx
-            print("Not possible to perform reduction")
+                elif value == 0.0:
+                    value = 0.001
+
+                root.destroy()
+                PCA(data, value)
+                    
+
+            elif option == "Explicit Dimension":
+                while True:
+                    value = simpledialog.askinteger("Test123", f"Enter an integer value from 1 to d to reduce your data to exactly these dimensions:")
+                    if not (value < 1 or value > data.shape[1]):
+                        break
+                root.destroy()
+                PCA(data, value)
+                
+
+        # Create the main window
+        root = tk.Tk()
+        root.title("Button Example")
+
+        # Create a label with a message
+        message_label = tk.Label(root, text="Analyzing dataset %s.\nWould you like to reduce dimensionality as far as possible while minimizing error to a certain threshold?\n\nOr, would you like to explicitly reduce the dimension?" % file)
+        message_label.pack()
+
+        # Create "Retained Variance" button
+        button_retained_variance = tk.Button(root, text="Retained Variance", command=lambda: button_click("Retained Variance"))
+        button_retained_variance.pack()
+
+        # Create "Explicit Dimension" button
+        button_explicit_dimension = tk.Button(root, text="Explicit Dimension", command=lambda: button_click("Explicit Dimension"))
+        button_explicit_dimension.pack()
+
+        # Start the Tkinter main loop
+        root.mainloop()
+
+        
