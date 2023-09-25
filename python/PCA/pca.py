@@ -135,7 +135,7 @@ def reduce(D, r):
         Y, U = np.linalg.eig(E) # Eigen values = Y, eigen vectors = U
 
         retention = 0
-        if (r is not 0 and r < 1):
+        if (r != 0 and r < 1):
             # Find optimal dimension for this alpha value
             r, retention = find_r(Y, r)
 
@@ -283,11 +283,12 @@ if __name__ == '__main__':
         def button_click(option):
             if option == "Retained Variance":
                 while True:
-                    value = simpledialog.askfloat("Test123", f"Enter a value between 0 and 1 pertaining to the ratio of variance required to be retained.\nYou will be presented with the lowest dimensional representation of the dataset that maintains at least this variance:")
-                    if not (value > 1 or value < 0):
-                        break
+                    value = simpledialog.askfloat("Retained Variance", f"Enter a value between 0 and 1 pertaining to the ratio of variance required to be retained.\nYou will be presented with the lowest dimensional representation of the dataset that maintains at least this variance:")
+                    if value is not None:
+                        if not (value > 1 or value < 0):
+                            break
                 if value == 1.0:
-                    value = 0
+                    value = 0.99999
 
                 elif value == 0.0:
                     value = 0.001
@@ -298,16 +299,17 @@ if __name__ == '__main__':
 
             elif option == "Explicit Dimension":
                 while True:
-                    value = simpledialog.askinteger("Test123", f"Enter an integer value from 1 to d to reduce your data to exactly these dimensions:")
-                    if not (value < 1 or value > data.shape[1]):
-                        break
+                    value = simpledialog.askinteger("Explicit Dimension", f"Enter an integer value from 1 to d to reduce your data to exactly these dimensions:")
+                    if value is not None:
+                        if not (value < 1 or value > data.shape[1]):
+                            break
                 root.destroy()
                 PCA(data, value)
                 
 
         # Create the main window
         root = tk.Tk()
-        root.title("Button Example")
+        root.title("Dimensionality Reduction")
 
         # Create a label with a message
         message_label = tk.Label(root, text="Analyzing dataset %s.\nWould you like to reduce dimensionality as far as possible while minimizing error to a certain threshold?\n\nOr, would you like to explicitly reduce the dimension?" % file)
